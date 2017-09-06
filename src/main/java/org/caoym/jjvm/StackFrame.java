@@ -1,5 +1,9 @@
 package org.caoym.jjvm;
 
+import com.sun.tools.classfile.ConstantPool;
+
+import java.util.ArrayList;
+
 /**
  * 栈帧
  *
@@ -12,13 +16,24 @@ public class StackFrame {
      * 用于存储方法的局部变量
      */
     private Slots localVariables;
+
     /**
      * 操作数栈(Operand Stack）
      * 用于存储操作指令的输入输出
      */
     private Slots operandStack;
 
-    public void StackFrame(Stack stack){
+    /**
+     * 常量池（Constant Pool）
+     */
+    private ConstantPool constantPool;
+
+    public StackFrame(ConstantPool constantPool) {
+        this.constantPool = constantPool;
+    }
+
+
+    public void StackFrame(Stack stack, ConstantPool){
 
     }
 
@@ -30,6 +45,7 @@ public class StackFrame {
         return operandStack;
     }
 
-
-
+    public ConstantPool getConstantPool() {
+        return constantPool;
+    }
 }

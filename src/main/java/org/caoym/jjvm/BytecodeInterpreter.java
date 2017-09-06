@@ -1,5 +1,7 @@
 package org.caoym.jjvm;
 
+import org.caoym.jjvm.opcodes.Operation;
+
 /**
  * Created by caoyangmin on 2017/9/5.
  * 字节码解析器

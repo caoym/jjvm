@@ -1,8 +1,9 @@
-package org.caoym.jjvm;
+package org.caoym.jjvm.opcodes;
 
-/**
- * Created by caoyangmin on 2017/9/6.
- */
-interface Operation {
-    public int call( Stack stack, StackFrame frame);
+import org.caoym.jjvm.Env;
+import org.caoym.jjvm.StackFrame;
+
+@FunctionalInterface
+public interface Operation {
+    public void call(Env env, StackFrame frame, int[] operands) throws Exception;
 }
