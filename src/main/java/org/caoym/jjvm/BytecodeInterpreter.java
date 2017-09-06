@@ -6,15 +6,16 @@ package org.caoym.jjvm;
  */
 public class BytecodeInterpreter {
 
-    //Program Counter
-    //Stack
-    //heap @VM
-    //Method Area @VM
-    //Runtime Constant Pool
-    //
-    int pc;
-    public void run(Env env) {
+    private JvmClass currentClass;
+    private JvmMethod currentMethod;
 
+    public void run(StackFrame frame) {
+        int pc = 0;
+        Operation[] operations = currentMethod.getOperations();
+        while (true){
+            Operation op = operations[pc];
+            op.call(frame);
+        }
     }
 
 }

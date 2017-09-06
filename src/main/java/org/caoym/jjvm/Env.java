@@ -5,4 +5,6 @@ package org.caoym.jjvm;
  */
 public class Env {
 
+    public JvmClass getClass(String className) {
+    }
 }
