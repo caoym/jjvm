@@ -23,7 +23,7 @@ public class BytecodeInterpreter {
     public static Opcode[] parseCodes(byte[] codes){
         ArrayList<Opcode> opcodes = new ArrayList<>();
         for(int i=0; i<codes.length; i++){
-            byte code = codes[i];
+            int code = 0xff&codes[i];
             if(OPCODES[code] == null){
                 throw new InternalError("The opcode "+Constants.OPCODE_NAMES[code]+" Not Impl");
             }
@@ -31,12 +31,21 @@ public class BytecodeInterpreter {
             final OpcodeImpl opcode = OPCODES[code];
             byte[] operands = Arrays.copyOfRange(codes, i + 1, i + 1 + noOfOperands);
             opcodes.add( (Env env, StackFrame frame)->opcode.call(env, frame, operands) );
+            i += noOfOperands;
         }
         return (Opcode[])opcodes.toArray();
     }
     static {
-        // getstatic: 获取对象的静态字段值
+
+        // aload_0: 将第一个引用类型局部变量推送至栈顶
+        OPCODES[Constants.ALOAD_0] = (Env env, StackFrame frame, byte[] operands)->{
+            frame.getOperandStack().push(frame.getLocalVariables().get(0), 1);
+        };
         OPCODES[Constants.RETURN] = (Env env, StackFrame frame, byte[] operands)->{
+            frame.setPC(-1);
+        };
+        // getstatic: 获取对象的静态字段值
+        OPCODES[Constants.GETSTATIC] = (Env env, StackFrame frame, byte[] operands)->{
             int index = operands[0];
             ConstantPool.CONSTANT_Fieldref_info info
                     = (ConstantPool.CONSTANT_Fieldref_info)frame.getConstantPool().get(index);
@@ -50,5 +59,11 @@ public class BytecodeInterpreter {
                     );
             frame.getOperandStack().push(value, 1);
         };
+
+        //invokespecial: 调用超类构造方法，实例初始化方法，私有方法。
+        OPCODES[Constants.INVOKESPECIAL] = (Env env, StackFrame frame, byte[] operands)->{
+            throw new InternalError("The opcode invokespecial Not Impl");
+        };
+
     }
 }

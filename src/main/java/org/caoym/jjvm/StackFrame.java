@@ -22,6 +22,10 @@ public class StackFrame {
     private SlotsStack operandStack;
 
     /**
+     * 程序计数器
+     */
+    private int pc=0;
+    /**
      * 常量池（Constant Pool）
      */
     private ConstantPool constantPool;
@@ -40,5 +44,12 @@ public class StackFrame {
 
     public ConstantPool getConstantPool() {
         return constantPool;
+    }
+
+    public void setPC(int pc) {
+        this.pc = pc;
+    }
+    public int getPC() {
+        return pc;
     }
 }
