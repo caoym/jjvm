@@ -2,8 +2,6 @@ package org.caoym.jjvm;
 
 import com.sun.tools.classfile.ConstantPool;
 
-import java.util.ArrayList;
-
 /**
  * 栈帧
  *
@@ -21,7 +19,7 @@ public class StackFrame {
      * 操作数栈(Operand Stack）
      * 用于存储操作指令的输入输出
      */
-    private Slots operandStack;
+    private SlotsStack operandStack;
 
     /**
      * 常量池（Constant Pool）
@@ -32,16 +30,11 @@ public class StackFrame {
         this.constantPool = constantPool;
     }
 
-
-    public void StackFrame(Stack stack, ConstantPool){
-
-    }
-
     public Slots getLocalVariables() {
         return localVariables;
     }
 
-    public Slots getOperandStack() {
+    public SlotsStack getOperandStack() {
         return operandStack;
     }
 

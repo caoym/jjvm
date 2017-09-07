@@ -1,4 +1,4 @@
-package org.caoym.jjvm.opcodes;
+package org.caoym.jjvm;
 
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
@@ -15,6 +15,11 @@ public class SlotsStack {
     public SlotsStack(int size){
         buffer = new ArrayList(size);
     }
+
+    public void push(Object entity) throws IllegalArgumentException{
+        this.push(entity, 1);
+    }
+
     public void push(Object entity, int size) throws IllegalArgumentException{
         if(size <=0 || end+size>buffer.size()){
             throw new IllegalArgumentException("invalid entity size "+size);

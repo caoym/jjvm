@@ -1,7 +1,8 @@
-package org.caoym.jjvm.opcodes;
+package org.caoym.jjvm;
 
-/**
- * Created by caoyangmin on 2017/9/7.
- */
-public class JvmMethod {
+public interface JvmMethod {
+    /**
+     * 执行对象或者类方法
+     */
+    public Object call(Env env, Object thiz, Object ...args) throws Exception ;
 }

@@ -1,59 +1,55 @@
 package org.caoym.jjvm;
 
-import com.sun.tools.classfile.ConstantPoolException;
+import sun.jvm.hotspot.oops.AccessFlags;
 
-import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Hashtable;
-import java.util.concurrent.Callable;
 
-/**
- * Created by caoyangmin on 2017/9/5.
- */
 public class VirtualMachine {
-
     /**
-     * 类搜索路径
+     * 初始类
+     * 包含 main 方法的类
      */
-    private Path classPath;
+    private String initialClass;
     /**
-     * 启动类
+     * 类加载器
      */
-    private String className;
-
+    private JvmClassLoader classLoader;
     /**
      * 方法区（Method Area）
      * 存储运行时类信息
      */
-    private Hashtable<Path, JvmClass> methodArea = new Hashtable<Path, JvmClass>();
+    private Hashtable<String, JvmClass> methodArea = new Hashtable<String, JvmClass>();
 
-    public VirtualMachine(Path classPath, String className){
-        this.className = className;
-        this.classPath = classPath;
+    public VirtualMachine(Path classPath, String initialClass){
+        classLoader = new JvmClassLoader(classPath);
+        this.initialClass = initialClass;
     }
 
-    public JvmClass findClass(String className) throws IOException, ConstantPoolException {
-        String fileName = classPath + "/"+className.replace(".", "/")+".class";
-        Path path = Paths.get(fileName);
-        JvmClass found;
-        if((found = methodArea.get(path)) != null){
-            return found;
+    public JvmClass findClass(String className) throws ClassNotFoundException {
+        JvmClass found = methodArea.get(className);
+        if(found == null){
+            found = classLoader.loadClass(className);
+            methodArea.put(className, found);
         }
-        methodArea.put(path, found = JvmClass.read(path));
         return found;
     }
 
-    public void run(String className, String[] args) throws Exception {
+    /**
+     * 执行虚拟机
+     * @param args
+     * @throws Exception
+     */
+    public void run(String[] args) throws Exception {
         Env env = new Env(this);
-        JvmClass clazz = findClass(className);
-        if(clazz == null){
-            throw new ClassNotFoundException("class "+className+" not found");
-        }
+        JvmClass clazz = findClass(initialClass);
         //找到入口方法
-        JvmMethod method = clazz.getStaticMethod("main", "([Ljava/lang/String;)V");
-        //执行路口方法
-        method.call(env, args);
+        JvmMethod method = clazz.getMethod(
+                "main",
+                "([Ljava/lang/String;)V",
+                (int)(AccessFlags.JVM_ACC_STATIC|AccessFlags.JVM_ACC_PUBLIC));
+        //执行入口方法
+        method.call(env, clazz, args);
     }
 
 }

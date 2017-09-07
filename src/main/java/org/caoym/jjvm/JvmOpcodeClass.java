@@ -1,35 +1,43 @@
 package org.caoym.jjvm;
 
 import com.sun.tools.classfile.*;
+import com.sun.tools.classfile.AccessFlags;
+import com.sun.tools.classfile.Method;
 import javafx.util.Pair;
+import sun.jvm.hotspot.oops.*;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashMap;
 
 /**
- * Created by caoyangmin on 2017/9/6.
+ * 字节码定义的 Java 类( 区别于 native 类 )
  */
-public class JvmClass {
+public class JvmOpcodeClass implements JvmClass{
 
     private ClassFile classFile;
-    private HashMap< Pair<String,String>, JvmMethod> methods;
+    private HashMap< Pair<String,String>, JvmOpcodeMethod> methods;
 
-    static public JvmClass read(Path path) throws IOException, ConstantPoolException {
-        return  new JvmClass(ClassFile.read(path));
+    static public JvmOpcodeClass read(Path path) throws ClassNotFoundException {
+        try {
+            return  new JvmOpcodeClass(ClassFile.read(path));
+        } catch (ConstantPoolException e) {
+            throw new InternalError(e);
+        } catch (IOException e) {
+            throw new ClassNotFoundException(e.toString());
+        }
     }
-
     /**
      *
      * @param classFile
      * @throws ConstantPoolException
      */
-    private JvmClass(ClassFile classFile) throws ConstantPoolException {
+    private JvmOpcodeClass(ClassFile classFile) throws ConstantPoolException {
         this.classFile = classFile;
         for (Method method : classFile.methods) {
             String name = method.getName(classFile.constant_pool);
             String desc = method.descriptor.getValue(classFile.constant_pool);
-            methods.put(new Pair<>(name, desc), new JvmMethod(classFile, method));
+            methods.put(new Pair<>(name, desc), new JvmOpcodeMethod(classFile, method));
         }
         //准备阶段
         prepare();
@@ -55,19 +63,20 @@ public class JvmClass {
     private void init(){
 
     }
-
-    public JvmMethod getStaticMethod(String name, String desc) throws NoSuchMethodException, ConstantPoolException {
-        JvmMethod method = methods.get(new Pair<>(name, desc));
+    @Override
+    public JvmMethod getMethod(String name, String desc, int flags) throws NoSuchMethodException {
+        JvmOpcodeMethod method = methods.get(new Pair<>(name, desc));
         if(method == null){
             throw new NoSuchMethodException("method "+name+"#"+ desc+" not exist");
         }
-        if(method.getAccessFlags().is(AccessFlags.ACC_STATIC|AccessFlags.ACC_PUBLIC)){
+        if(method.getAccessFlags().is(flags)){
             throw new NoSuchMethodException("method "+name+"#"+ desc+" not a `public static` method");
         }
         return method;
     }
 
-    public Object getStaticField(String name, String type) {
-
+    @Override
+    public Object getField(String name, String type, int flags) throws NoSuchFieldException {
+        throw new InternalError("Not Impl");
     }
 }
