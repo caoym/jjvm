@@ -16,7 +16,7 @@ import java.util.HashMap;
 public class JvmOpcodeClass implements JvmClass{
 
     private ClassFile classFile;
-    private HashMap< Pair<String,String>, JvmOpcodeMethod> methods;
+    private HashMap<String, JvmOpcodeMethod> methods;
 
     static public JvmOpcodeClass read(Path path) throws ClassNotFoundException {
         try {
@@ -37,7 +37,7 @@ public class JvmOpcodeClass implements JvmClass{
         for (Method method : classFile.methods) {
             String name = method.getName(classFile.constant_pool);
             String desc = method.descriptor.getValue(classFile.constant_pool);
-            methods.put(new Pair<>(name, desc), new JvmOpcodeMethod(classFile, method));
+            methods.put(name+":"+desc, new JvmOpcodeMethod(classFile, method));
         }
         //准备阶段
         prepare();
@@ -65,12 +65,12 @@ public class JvmOpcodeClass implements JvmClass{
     }
     @Override
     public JvmMethod getMethod(String name, String desc, int flags) throws NoSuchMethodException {
-        JvmOpcodeMethod method = methods.get(new Pair<>(name, desc));
+        JvmOpcodeMethod method = methods.get(name+":"+desc);
         if(method == null){
-            throw new NoSuchMethodException("method "+name+"#"+ desc+" not exist");
+            throw new NoSuchMethodException("method "+name+":"+ desc+" not exist");
         }
         if(method.getAccessFlags().is(flags)){
-            throw new NoSuchMethodException("method "+name+"#"+ desc+" not a `public static` method");
+            throw new NoSuchMethodException("method "+name+":"+ desc+" not a `public static` method");
         }
         return method;
     }

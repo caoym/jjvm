@@ -14,7 +14,8 @@ public class JJvm {
         }
         VirtualMachine vm = new VirtualMachine(Paths.get("."), args[0]);
         try {
-            vm.run(Arrays.copyOfRange(args, 1, args.length-1));
+            args = Arrays.copyOfRange(args, 1, args.length);
+            vm.run(args);
         } catch (Exception e) {
             e.printStackTrace();
         }

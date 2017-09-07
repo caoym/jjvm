@@ -1,9 +1,7 @@
 package org.caoym.jjvm;
 
-import com.sun.tools.classfile.AccessFlags;
-import com.sun.tools.classfile.ClassFile;
-import com.sun.tools.classfile.Method;
-import org.caoym.jjvm.opcodes.Operation;
+import com.sun.tools.classfile.*;
+import org.caoym.jjvm.opcodes.Opcode;
 
 /**
  * 字节码方法（区别于 native 方法）
@@ -12,22 +10,24 @@ public class JvmOpcodeMethod implements JvmMethod {
 
     private ClassFile classFile;
     private Method method;
-    private Operation[] operations;
+    private Opcode[] opcodes;
+    private Code_attribute codeAttribute;
 
     public JvmOpcodeMethod(ClassFile classFile, Method method)
     {
         this.classFile = classFile;
         this.method = method;
-        operations = new Operation[0];
+        codeAttribute = (Code_attribute)method.attributes.get("Code");
+
+        if(codeAttribute.code_length > 0){
+            opcodes = new Opcode[codeAttribute.code_length];
+        }
+
     }
 
-    public AccessFlags getAccessFlags()
-    {
-        return method.access_flags;
-    }
 
-    public Operation[] getOperations() {
-        return operations;
+    public Opcode[] getOpcodes() {
+        return opcodes;
     }
 
     /**
@@ -42,12 +42,16 @@ public class JvmOpcodeMethod implements JvmMethod {
         StackFrame frame = env.getStack().newFrame(classFile.constant_pool);
 
         //执行字节码
-        Operation[] operations = getOperations();
+        Opcode[] operations = getOpcodes();
         while (pc != -1){
-            Operation op = operations[pc];
-            op.call(env, frame, new int[]{});
+            Opcode op = operations[pc];
+            op.call(env, frame);
             pc++;
         }
         return null;
+    }
+
+    public AccessFlags getAccessFlags() {
+        return method.access_flags;
     }
 }
