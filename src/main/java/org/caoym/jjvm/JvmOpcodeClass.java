@@ -16,7 +16,7 @@ import java.util.HashMap;
 public class JvmOpcodeClass implements JvmClass{
 
     private ClassFile classFile;
-    private HashMap<String, JvmOpcodeMethod> methods;
+    private HashMap<String, JvmOpcodeMethod> methods = new HashMap<>();
 
     static public JvmOpcodeClass read(Path path) throws ClassNotFoundException {
         try {
@@ -69,8 +69,8 @@ public class JvmOpcodeClass implements JvmClass{
         if(method == null){
             throw new NoSuchMethodException("method "+name+":"+ desc+" not exist");
         }
-        if(method.getAccessFlags().is(flags)){
-            throw new NoSuchMethodException("method "+name+":"+ desc+" not a `public static` method");
+        if(!method.getAccessFlags().is(flags)){
+            throw new NoSuchMethodException("method "+name+":"+ desc+" invalid AccessFlags");
         }
         return method;
     }

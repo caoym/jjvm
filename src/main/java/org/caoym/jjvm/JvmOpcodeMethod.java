@@ -19,33 +19,37 @@ public class JvmOpcodeMethod implements JvmMethod {
         this.method = method;
         codeAttribute = (Code_attribute)method.attributes.get("Code");
         opcodes = BytecodeInterpreter.parseCodes(codeAttribute.code);
-
-    }
-
-
-    public Opcode[] getOpcodes() {
-        return opcodes;
     }
 
     /**
      * 解释执行方法的字节码
      */
-    public Object call(Env env, Object thiz, Object ...args) throws Exception {
+    public void call(Env env, Object thiz, Object ...args) throws Exception {
+        // 每次方法调用都产生一个新的栈帧，当前方法返回后，将其（栈帧）设置为已返回，BytecodeInterpreter.run会在检查到返回后，将栈帧推
+        // 出栈，并将返回值（如果有）推入上一个栈帧的操作数栈
 
-        // 程序计数器（Program Counter）, 保存 Java 虚拟机正在执行的 字节码指令的地址.
-        int pc = 0;
+        StackFrame frame = env.getStack().newFrame(
+                classFile.constant_pool,
+                opcodes,
+                codeAttribute.max_locals,
+                codeAttribute.max_stack);
 
-        // 每次方法调用都产生一个新的栈帧，并入栈，方法退出后出栈
-        StackFrame frame = env.getStack().newFrame(classFile.constant_pool);
+        // Java 虚拟机使用局部变量表来完成方法调用时的参数传递，当一个方法被调用的时候，它的 参数将会传递至从 0 开始的连续的局部变量表位置
+        // 上。特别地，当一个实例方法被调用的时候， 第 0 个局部变量一定是用来存储被调用的实例方法所在的对象的引用(即 Java 语言中的“this”
+        // 关键字)。后续的其他参数将会传递至从 1 开始的连续的局部变量表位置上。
 
-        //执行字节码
-        Opcode[] operations = getOpcodes();
-        while (pc != -1){
-            Opcode op = operations[pc];
-            op.call(env, frame);
-            pc++;
+        Slots<Object> locals = frame.getLocalVariables();
+        int pos = 0;
+        if(!method.access_flags.is(AccessFlags.ACC_STATIC)){
+            locals.set(0, thiz, 1);
+            pos++;
         }
-        return null;
+
+        for (Object arg : args) {
+            locals.set(pos++, arg, 1);
+        }
+
+        BytecodeInterpreter.run(env);
     }
 
     public AccessFlags getAccessFlags() {

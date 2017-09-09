@@ -1,8 +1,10 @@
 package org.caoym.jjvm.natives;
 
+import jdk.internal.org.objectweb.asm.Type;
 import org.caoym.jjvm.JvmClass;
 import org.caoym.jjvm.JvmMethod;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 
@@ -17,7 +19,7 @@ public class JvmNativeClass implements JvmClass {
     public JvmNativeClass(Class nativeClass){
         this.nativeClass = nativeClass;
         for (Method method : nativeClass.getMethods()) {
-            String key = method.getName()+":"+method.toGenericString();
+            String key = method.getName()+":"+Type.getMethodDescriptor(method);
             methods.put(key, new JvmNativeMethod(method));
         }
     }
@@ -36,7 +38,8 @@ public class JvmNativeClass implements JvmClass {
     }
 
     @Override
-    public Object getField(String name, String type, int flags) throws NoSuchFieldException {
-        throw new InternalError("Not Impl");
+    public Object getField(String name, String type, int flags) throws NoSuchFieldException, IllegalAccessException {
+        Field filed = nativeClass.getField(name);
+        return filed.get(nativeClass);
     }
 }

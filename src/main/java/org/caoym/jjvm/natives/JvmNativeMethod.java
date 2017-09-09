@@ -3,6 +3,7 @@ package org.caoym.jjvm.natives;
 import com.sun.tools.classfile.AccessFlags;
 import org.caoym.jjvm.Env;
 import org.caoym.jjvm.JvmMethod;
+import org.caoym.jjvm.StackFrame;
 
 import java.lang.reflect.Method;
 
@@ -17,13 +18,11 @@ public class JvmNativeMethod implements JvmMethod {
         this.method = method;
     }
     @Override
-    public Object call(Env env, Object thiz, Object... args) throws Exception {
-        return method.invoke(thiz, args);
-    }
-
-    @Override
-    public AccessFlags getAccessFlags() {
-        return new AccessFlags(method.getModifiers());
+    public void call(Env env, Object thiz, Object... args) throws Exception {
+        StackFrame frame = env.getStack().newFrame();
+        Object res = method.invoke(thiz, args);
+        //将返回值推入调用者的操作数栈
+        frame.setReturn(res, method.getReturnType().getName());
     }
 
     public Method getNativeMethod() {
