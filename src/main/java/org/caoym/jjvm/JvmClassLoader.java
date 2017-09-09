@@ -28,8 +28,8 @@ public class JvmClassLoader {
         //否则尝试通过虚拟机宿主加载指定类，并将加载后的类当做 native 类
         if(Files.exists(path)){
              return JvmOpcodeClass.read(path);
-        } else{
-            return new JvmNativeClass(getClass().getClassLoader().loadClass(className));
+        }else{
+            return new JvmNativeClass(Class.forName(className.replace("/",".")));
         }
     }
 }

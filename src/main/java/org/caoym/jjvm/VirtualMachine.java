@@ -49,7 +49,7 @@ public class VirtualMachine {
                 "([Ljava/lang/String;)V",
                 (int)(AccessFlags.JVM_ACC_STATIC|AccessFlags.JVM_ACC_PUBLIC));
         //执行入口方法
-        method.call(env, clazz, args);
+        method.call(env, clazz, (Object[]) args);
     }
 
 }
