@@ -25,5 +25,5 @@ public interface JvmClass {
      * @return
      * @throws NoSuchFieldException
      */
-    public Object getField(String name, String type, int flags) throws NoSuchFieldException;
+    public Object getField(String name, String type, int flags) throws NoSuchFieldException, IllegalAccessException;
 }
