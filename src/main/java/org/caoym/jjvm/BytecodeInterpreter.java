@@ -119,8 +119,52 @@ public class BytecodeInterpreter {
             method.call(env, args[0], Arrays.copyOfRange(args,1, args.length));
 
         };
-
-
+        //dconst_0: 将 double 型 0 推送至栈顶
+        OPCODES[Constants.DCONST_0] = (Env env, StackFrame frame, byte[] operands)->{
+            frame.getOperandStack().push(Double.valueOf(0),2);
+        };
+        //dstore_1: 将栈顶 double 型数值存入第二个局部变量。
+        OPCODES[Constants.DSTORE_1] = (Env env, StackFrame frame, byte[] operands)->{
+            Object var = frame.getOperandStack().pop();
+            frame.getLocalVariables().set(1, var, 2);
+        };
+        //dload_1: 将第二个 double 型局部变量推送至栈顶。
+        OPCODES[Constants.DLOAD_1] = (Env env, StackFrame frame, byte[] operands)->{
+            Object var =  frame.getLocalVariables().get(1);
+            frame.getOperandStack().push(var, 2);
+        };
+        //dconst_1: 将 double 型 1 推送至栈顶
+        OPCODES[Constants.DCONST_1] = (Env env, StackFrame frame, byte[] operands)->{
+            frame.getOperandStack().push(Double.valueOf(1),2);
+        };
+        //dadd: 将栈顶两 double 型数值相加并将结果压入栈顶。
+        OPCODES[Constants.DADD] = (Env env, StackFrame frame, byte[] operands)->{
+            Double var1 = (Double) frame.getOperandStack().pop();
+            Double var2 = (Double) frame.getOperandStack().pop();
+            frame.getOperandStack().push(var1+var2,2);
+        };
+        //iconst_1: 将 int 型 1 推送至栈顶
+        OPCODES[Constants.ICONST_1] = (Env env, StackFrame frame, byte[] operands)->{
+            frame.getOperandStack().push(Integer.valueOf(1),1);
+        };
+        //istore_3: 将栈顶 int 型数值存入第四个局部变量。
+        OPCODES[Constants.ISTORE_3] = (Env env, StackFrame frame, byte[] operands)->{
+            frame.getLocalVariables().set(3,frame.getOperandStack().pop(),1);
+        };
+        //iinc: 将指定 int 型变量增加指定值。
+        OPCODES[Constants.IINC] = (Env env, StackFrame frame, byte[] operands)->{
+            Integer var = (Integer) frame.getLocalVariables().get(operands[0]);
+            frame.getLocalVariables().set(operands[0], var + operands[1], 1);
+        };
+        //iload_3: 将第四个 int 型局部变量推送至栈顶。
+        OPCODES[Constants.ILOAD_3] = (Env env, StackFrame frame, byte[] operands)->{
+            frame.getOperandStack().push(frame.getLocalVariables().get(3),1);
+        };
+        //i2d: 将栈顶 int 型数值强制转换成 double 型数值并将结果压入栈 顶。
+        OPCODES[Constants.I2D] = (Env env, StackFrame frame, byte[] operands)->{
+            Integer var = (Integer) frame.getOperandStack().pop();
+            frame.getOperandStack().push(Double.valueOf(var.intValue()), 2);
+        };
     }
     static private Object asObject(ConstantPool.CPInfo info) throws ConstantPoolException {
         switch (info.getTag()){
