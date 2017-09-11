@@ -25,16 +25,6 @@ public class VirtualMachine {
         classLoader = new JvmClassLoader(classPath);
         this.initialClass = initialClass;
     }
-
-    public JvmClass findClass(String className) throws ClassNotFoundException {
-        JvmClass found = methodArea.get(className);
-        if(found == null){
-            found = classLoader.loadClass(className);
-            methodArea.put(className, found);
-        }
-        return found;
-    }
-
     /**
      * 执行虚拟机
      * @param args
@@ -51,5 +41,16 @@ public class VirtualMachine {
         //执行入口方法
         method.call(env, clazz, (Object[]) args);
     }
+
+    public JvmClass findClass(String className) throws ClassNotFoundException {
+        JvmClass found = methodArea.get(className);
+        if(found == null){
+            found = classLoader.loadClass(className);
+            methodArea.put(className, found);
+        }
+        return found;
+    }
+
+
 
 }

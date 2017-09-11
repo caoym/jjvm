@@ -13,8 +13,7 @@ public class JvmOpcodeMethod implements JvmMethod {
     private Opcode[] opcodes;
     private Code_attribute codeAttribute;
 
-    public JvmOpcodeMethod(ClassFile classFile, Method method)
-    {
+    public JvmOpcodeMethod(ClassFile classFile, Method method) {
         this.classFile = classFile;
         this.method = method;
         codeAttribute = (Code_attribute)method.attributes.get("Code");
