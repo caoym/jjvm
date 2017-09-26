@@ -1,5 +1,6 @@
 package org.caoym.jjvm;
 
+import org.caoym.jjvm.runtime.Env;
 import sun.jvm.hotspot.oops.AccessFlags;
 
 import java.nio.file.Path;

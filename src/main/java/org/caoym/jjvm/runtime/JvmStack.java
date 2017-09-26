@@ -1,4 +1,4 @@
-package org.caoym.jjvm;
+package org.caoym.jjvm.runtime;
 
 import com.sun.tools.classfile.ConstantPool;
 import org.caoym.jjvm.opcodes.Opcode;
@@ -7,7 +7,7 @@ import org.caoym.jjvm.opcodes.Opcode;
  * 虚拟机栈
  * 每个虚拟机线程持有一个独立的栈
  */
-public class Stack {
+public class JvmStack {
 
     private SlotsStack<StackFrame> frames = new SlotsStack<>(1024);
     private boolean running = false;

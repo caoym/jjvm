@@ -1,4 +1,4 @@
-package org.caoym.jjvm;
+package org.caoym.jjvm.runtime;
 
 import com.sun.tools.classfile.ConstantPool;
 import org.caoym.jjvm.opcodes.Opcode;

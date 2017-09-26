@@ -1,6 +1,6 @@
 package org.caoym.jjvm;
 
-import com.sun.tools.classfile.AccessFlags;
+import org.caoym.jjvm.runtime.Env;
 
 public interface JvmMethod {
     /**

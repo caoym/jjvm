@@ -1,7 +1,7 @@
 package org.caoym.jjvm.opcodes;
 
-import org.caoym.jjvm.Env;
-import org.caoym.jjvm.StackFrame;
+import org.caoym.jjvm.runtime.Env;
+import org.caoym.jjvm.runtime.StackFrame;
 
 @FunctionalInterface
 public interface Opcode {

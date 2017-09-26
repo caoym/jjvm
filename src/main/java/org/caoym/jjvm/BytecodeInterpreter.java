@@ -4,8 +4,10 @@ import com.sun.org.apache.bcel.internal.Constants;
 import com.sun.tools.classfile.AccessFlags;
 import com.sun.tools.classfile.ConstantPool;
 import com.sun.tools.classfile.ConstantPoolException;
-import com.sun.tools.javac.util.ArrayUtils;
 import org.caoym.jjvm.opcodes.Opcode;
+import org.caoym.jjvm.runtime.Env;
+import org.caoym.jjvm.runtime.JvmStack;
+import org.caoym.jjvm.runtime.StackFrame;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,10 +18,10 @@ import java.util.Arrays;
  */
 public class BytecodeInterpreter {
 
-    interface OpcodeImpl{
+    interface OpcodeInterface{
         public void call(Env env, StackFrame frame, byte[] operands) throws Exception;
     }
-    public static final OpcodeImpl[] OPCODES = new OpcodeImpl[256];
+    public static final OpcodeInterface[] OPCODES = new OpcodeInterface[256];
 
     //执行字节码
     public static void run(Env env) throws Exception {
@@ -28,7 +30,7 @@ public class BytecodeInterpreter {
             return;
         }
         StackFrame frame;
-        Stack stack = env.getStack();
+        JvmStack stack = env.getStack();
         stack.setRunning(true);
 
         while ((frame = stack.currentFrame()) != null){
@@ -57,13 +59,14 @@ public class BytecodeInterpreter {
                 throw new InternalError("The opcode "+Constants.OPCODE_NAMES[code]+" Not Impl");
             }
             short noOfOperands = Constants.NO_OF_OPERANDS[code];
-            final OpcodeImpl opcode = OPCODES[code];
+            final OpcodeInterface opcode = OPCODES[code];
             byte[] operands = Arrays.copyOfRange(codes, i + 1, i + 1 + noOfOperands);
             opcodes.add( (Env env, StackFrame frame)->opcode.call(env, frame, operands) );
             i += noOfOperands;
         }
         return Arrays.copyOf(opcodes.toArray(), opcodes.size(), Opcode[].class);
     }
+    enum ALOAD_0
     static {
         //aload_0: 将第一个引用类型局部变量推送至栈顶
         OPCODES[Constants.ALOAD_0] = (Env env, StackFrame frame, byte[] operands)->{
@@ -121,7 +124,7 @@ public class BytecodeInterpreter {
         };
         //dconst_0: 将 double 型 0 推送至栈顶
         OPCODES[Constants.DCONST_0] = (Env env, StackFrame frame, byte[] operands)->{
-            frame.getOperandStack().push(Double.valueOf(0),2);
+            frame.getOperandStack().push(0.0,2);
         };
         //dstore_1: 将栈顶 double 型数值存入第二个局部变量。
         OPCODES[Constants.DSTORE_1] = (Env env, StackFrame frame, byte[] operands)->{
@@ -135,7 +138,7 @@ public class BytecodeInterpreter {
         };
         //dconst_1: 将 double 型 1 推送至栈顶
         OPCODES[Constants.DCONST_1] = (Env env, StackFrame frame, byte[] operands)->{
-            frame.getOperandStack().push(Double.valueOf(1),2);
+            frame.getOperandStack().push(1.0,2);
         };
         //dadd: 将栈顶两 double 型数值相加并将结果压入栈顶。
         OPCODES[Constants.DADD] = (Env env, StackFrame frame, byte[] operands)->{
@@ -145,7 +148,7 @@ public class BytecodeInterpreter {
         };
         //iconst_1: 将 int 型 1 推送至栈顶
         OPCODES[Constants.ICONST_1] = (Env env, StackFrame frame, byte[] operands)->{
-            frame.getOperandStack().push(Integer.valueOf(1),1);
+            frame.getOperandStack().push(1,1);
         };
         //istore_3: 将栈顶 int 型数值存入第四个局部变量。
         OPCODES[Constants.ISTORE_3] = (Env env, StackFrame frame, byte[] operands)->{
@@ -163,15 +166,15 @@ public class BytecodeInterpreter {
         //i2d: 将栈顶 int 型数值强制转换成 double 型数值并将结果压入栈 顶。
         OPCODES[Constants.I2D] = (Env env, StackFrame frame, byte[] operands)->{
             Integer var = (Integer) frame.getOperandStack().pop();
-            frame.getOperandStack().push(Double.valueOf(var.intValue()), 2);
+            frame.getOperandStack().push((double)var, 2);
         };
     }
     static private Object asObject(ConstantPool.CPInfo info) throws ConstantPoolException {
         switch (info.getTag()){
             case ConstantPool.CONSTANT_Integer:
-                return Integer.valueOf(((ConstantPool.CONSTANT_Integer_info)info).value);
+                return ((ConstantPool.CONSTANT_Integer_info) info).value;
             case ConstantPool.CONSTANT_Float:
-                return Float.valueOf(((ConstantPool.CONSTANT_Float_info)info).value);
+                return ((ConstantPool.CONSTANT_Float_info) info).value;
             case ConstantPool.CONSTANT_String:
                 return ((ConstantPool.CONSTANT_String_info)info).getString();
             default:

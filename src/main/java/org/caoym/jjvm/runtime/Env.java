@@ -1,6 +1,7 @@
-package org.caoym.jjvm;
+package org.caoym.jjvm.runtime;
 
 import com.sun.tools.classfile.ConstantPoolException;
+import org.caoym.jjvm.VirtualMachine;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -14,7 +15,7 @@ public class Env {
     /**
      * 虚拟机栈
      */
-    private Stack stack = new Stack();
+    private JvmStack stack = new JvmStack();
     /**
      * 当前虚拟机
      */
@@ -24,7 +25,7 @@ public class Env {
         this.vm = vm;
     }
 
-    public Stack getStack() {
+    public JvmStack getStack() {
         return stack;
     }
 

@@ -1,5 +1,7 @@
 package org.caoym.jjvm;
 
+import jdk.internal.org.objectweb.asm.ClassReader;
+
 import java.nio.file.Paths;
 import java.util.Arrays;
 
