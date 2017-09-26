@@ -1,7 +1,6 @@
 package org.caoym.jjvm.runtime;
 
 import com.sun.tools.classfile.ConstantPool;
-import org.caoym.jjvm.opcodes.Opcode;
 
 /**
  * 栈帧
@@ -25,7 +24,7 @@ public class StackFrame {
     /**
      * 字节码
      */
-    private Opcode[] opcodes;
+    private OpcodeInvoker[] opcodes;
 
     /**
      * 程序计数器
@@ -39,25 +38,25 @@ public class StackFrame {
     private String returnType;
     private boolean isReturned = false;
 
-    public StackFrame(ConstantPool constantPool,
-                      Opcode[] opcodes,
+    StackFrame(ConstantPool constantPool,
+                      OpcodeInvoker[] opcodes,
                       int variables,
                       int stackSize) {
         this.constantPool = constantPool;
         this.opcodes = opcodes;
-        this.operandStack = new SlotsStack(stackSize);
-        this.localVariables = new Slots(variables);
+        this.operandStack = new SlotsStack<>(stackSize);
+        this.localVariables = new Slots<>(variables);
     }
 
     public Slots<Object> getLocalVariables() {
         return localVariables;
     }
 
-    public SlotsStack<Object> getOperandStack() {
+    SlotsStack<Object> getOperandStack() {
         return operandStack;
     }
 
-    public ConstantPool getConstantPool() {
+    ConstantPool getConstantPool() {
         return constantPool;
     }
 
@@ -85,10 +84,10 @@ public class StackFrame {
     public int getPC() {
         return pc;
     }
-    public int increasePC(){
+    int increasePC(){
         return pc++;
     }
-    public Opcode[] getOpcodes() {
+    OpcodeInvoker[] getOpcodes() {
         return opcodes;
     }
 }

@@ -1,27 +1,14 @@
-package org.caoym.jjvm;
+package org.caoym.jjvm.runtime;
 
 import com.sun.org.apache.bcel.internal.Constants;
-import com.sun.tools.classfile.AccessFlags;
-import com.sun.tools.classfile.ConstantPool;
-import com.sun.tools.classfile.ConstantPoolException;
-import org.caoym.jjvm.opcodes.Opcode;
-import org.caoym.jjvm.runtime.Env;
-import org.caoym.jjvm.runtime.JvmStack;
-import org.caoym.jjvm.runtime.OpcodeRout;
-import org.caoym.jjvm.runtime.StackFrame;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
- * Created by caoyangmin on 2017/9/5.
  * 字节码解析器
  */
 public class BytecodeInterpreter {
 
-    public interface OpcodeInvoker{
-        public void invoke(Env env, StackFrame frame) throws Exception ;
-    }
     //执行字节码
     public static void run(Env env) throws Exception {
         //只需要最外层调用执行栈上操作
@@ -62,9 +49,5 @@ public class BytecodeInterpreter {
         }
         return Arrays.copyOf(opcodes.toArray(), opcodes.size(), OpcodeInvoker[].class);
     }
-    static {
-
-    }
-
 
 }

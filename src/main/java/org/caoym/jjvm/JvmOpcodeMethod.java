@@ -1,10 +1,7 @@
 package org.caoym.jjvm;
 
 import com.sun.tools.classfile.*;
-import org.caoym.jjvm.opcodes.Opcode;
-import org.caoym.jjvm.runtime.Env;
-import org.caoym.jjvm.runtime.Slots;
-import org.caoym.jjvm.runtime.StackFrame;
+import org.caoym.jjvm.runtime.*;
 
 /**
  * 字节码方法（区别于 native 方法）
@@ -13,7 +10,7 @@ public class JvmOpcodeMethod implements JvmMethod {
 
     private ClassFile classFile;
     private Method method;
-    private Opcode[] opcodes;
+    private OpcodeInvoker[] opcodes;
     private Code_attribute codeAttribute;
 
     public JvmOpcodeMethod(ClassFile classFile, Method method) {

@@ -1,7 +1,5 @@
 package org.caoym.jjvm.runtime;
 
-/**
- * Created by caoyangmin on 2017/9/26.
- */
-public class OpcodeInvoker {
+public interface OpcodeInvoker {
+    public void invoke(Env env, StackFrame frame) throws Exception ;
 }

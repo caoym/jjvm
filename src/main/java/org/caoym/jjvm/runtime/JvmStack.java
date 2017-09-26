@@ -1,7 +1,6 @@
 package org.caoym.jjvm.runtime;
 
 import com.sun.tools.classfile.ConstantPool;
-import org.caoym.jjvm.opcodes.Opcode;
 
 /**
  * 虚拟机栈
@@ -19,7 +18,7 @@ public class JvmStack {
     }
 
     public StackFrame newFrame(ConstantPool constantPool,
-                               Opcode[] opcodes,
+                               OpcodeInvoker[] opcodes,
                                int variables,
                                int stackSize) {
         StackFrame frame = new StackFrame(constantPool, opcodes, variables, stackSize);
