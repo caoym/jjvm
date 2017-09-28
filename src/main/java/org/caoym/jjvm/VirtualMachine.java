@@ -1,5 +1,7 @@
 package org.caoym.jjvm;
 
+import org.caoym.jjvm.lang.JvmClass;
+import org.caoym.jjvm.lang.JvmMethod;
 import org.caoym.jjvm.runtime.Env;
 import sun.jvm.hotspot.oops.AccessFlags;
 

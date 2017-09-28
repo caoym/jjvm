@@ -1,7 +1,5 @@
 package org.caoym.jjvm;
 
-import jdk.internal.org.objectweb.asm.ClassReader;
-
 import java.nio.file.Paths;
 import java.util.Arrays;
 
@@ -11,7 +9,7 @@ import java.util.Arrays;
 public class JJvm {
     static public void main(String[] args){
         if(args.length == 0){
-            System.out.println("usage: JJvm class [args...]");
+            System.out.println("Usage: JJvm class [args...]");
             return;
         }
         VirtualMachine vm = new VirtualMachine(Paths.get("."), args[0]);

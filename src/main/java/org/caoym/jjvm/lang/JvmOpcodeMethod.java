@@ -1,4 +1,4 @@
-package org.caoym.jjvm;
+package org.caoym.jjvm.lang;
 
 import com.sun.tools.classfile.*;
 import org.caoym.jjvm.runtime.*;
@@ -8,13 +8,13 @@ import org.caoym.jjvm.runtime.*;
  */
 public class JvmOpcodeMethod implements JvmMethod {
 
-    private ClassFile classFile;
+    private JvmOpcodeClass clazz;
     private Method method;
     private OpcodeInvoker[] opcodes;
     private Code_attribute codeAttribute;
 
-    public JvmOpcodeMethod(ClassFile classFile, Method method) {
-        this.classFile = classFile;
+    public JvmOpcodeMethod(JvmOpcodeClass clazz, Method method) {
+        this.clazz = clazz;
         this.method = method;
         codeAttribute = (Code_attribute)method.attributes.get("Code");
         opcodes = BytecodeInterpreter.parseCodes(codeAttribute.code);
@@ -24,11 +24,13 @@ public class JvmOpcodeMethod implements JvmMethod {
      * 解释执行方法的字节码
      */
     public void call(Env env, Object thiz, Object ...args) throws Exception {
+        // 执行方法前确保类已经初始化
+        clazz.clinit(env);
         // 每次方法调用都产生一个新的栈帧，当前方法返回后，将其（栈帧）设置为已返回，BytecodeInterpreter.run会在检查到返回后，将栈帧推
         // 出栈，并将返回值（如果有）推入上一个栈帧的操作数栈
 
         StackFrame frame = env.getStack().newFrame(
-                classFile.constant_pool,
+                clazz.getClassFile().constant_pool,
                 opcodes,
                 codeAttribute.max_locals,
                 codeAttribute.max_stack);

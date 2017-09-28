@@ -1,15 +1,17 @@
-package org.caoym.jjvm.natives;
+package org.caoym.jjvm.lang.natives;
 
 import jdk.internal.org.objectweb.asm.Type;
-import org.caoym.jjvm.JvmClass;
-import org.caoym.jjvm.JvmMethod;
+import org.caoym.jjvm.lang.JvmClass;
+import org.caoym.jjvm.lang.JvmMethod;
+import org.caoym.jjvm.lang.JvmObject;
+import org.caoym.jjvm.runtime.Env;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 
 /**
- * Created by caoyangmin on 2017/9/7.
+ * 包装 native 类
  */
 public class JvmNativeClass implements JvmClass {
 
@@ -22,6 +24,11 @@ public class JvmNativeClass implements JvmClass {
             String key = method.getName()+":"+Type.getMethodDescriptor(method);
             methods.put(key, new JvmNativeMethod(method));
         }
+    }
+
+    @Override
+    public JvmObject newInstance(Env env) throws InstantiationException, IllegalAccessException {
+        return new JvmNativeObject(nativeClass.newInstance());
     }
 
     @Override
@@ -41,5 +48,9 @@ public class JvmNativeClass implements JvmClass {
     public Object getField(String name, String type, int flags) throws NoSuchFieldException, IllegalAccessException {
         Field filed = nativeClass.getField(name);
         return filed.get(nativeClass);
+    }
+
+    @Override
+    public void putField(Env env, String name, Object value) throws NoSuchFieldException, IllegalAccessException {
     }
 }

@@ -1,7 +1,7 @@
-package org.caoym.jjvm.lang.natives;
+package org.caoym.jjvm.lang;
 
-/**
- * Created by caoyangmin on 2017/9/26.
- */
-public class JvmObject {
+public interface JvmObject{
+
+    void putField(String name, Object value) throws NoSuchFieldException, IllegalAccessException;
+    Object getField(String name) throws NoSuchFieldException, IllegalAccessException;
 }

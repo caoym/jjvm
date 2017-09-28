@@ -1,13 +1,13 @@
-package org.caoym.jjvm.natives;
+package org.caoym.jjvm.lang.natives;
 
 import org.caoym.jjvm.runtime.Env;
-import org.caoym.jjvm.JvmMethod;
+import org.caoym.jjvm.lang.JvmMethod;
 import org.caoym.jjvm.runtime.StackFrame;
 
 import java.lang.reflect.Method;
 
 /**
- * Created by caoyangmin on 2017/9/7.
+ * 包装 native 方法
  */
 public class JvmNativeMethod implements JvmMethod {
 

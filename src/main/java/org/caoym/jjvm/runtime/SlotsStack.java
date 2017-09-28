@@ -97,4 +97,16 @@ public class SlotsStack<T> {
         }
         return null;
     }
+
+    public int getEndSize() {
+        int end = this.end;
+        while (end > 0)
+        {
+            end--;
+            if(buffer[end] != null){
+                return this.end-end;
+            }
+        }
+        return 0;
+    }
 }

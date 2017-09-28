@@ -1,6 +1,8 @@
 package org.caoym.jjvm;
 
-import org.caoym.jjvm.natives.JvmNativeClass;
+import org.caoym.jjvm.lang.JvmClass;
+import org.caoym.jjvm.lang.JvmOpcodeClass;
+import org.caoym.jjvm.lang.natives.JvmNativeClass;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
