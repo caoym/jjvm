@@ -1,8 +1,6 @@
 package org.caoym.jjvm.lang;
 
 import com.sun.tools.classfile.*;
-import com.sun.tools.classfile.Method;
-import org.caoym.jjvm.lang.natives.JvmNativeObject;
 import org.caoym.jjvm.runtime.Env;
 
 import java.io.IOException;
@@ -18,7 +16,7 @@ public class JvmOpcodeClass implements JvmClass{
 
     private final ClassFile classFile;
     private Map<Map.Entry<String, String>, JvmOpcodeMethod> methods = new HashMap<>();
-    private Map<String, JvmOpcodeStaticField> staticFields = new HashMap<>();
+    private Map<String, JvmField> fields = new HashMap<>();
     /**
      *  是否已经初始化
      */
@@ -58,7 +56,9 @@ public class JvmOpcodeClass implements JvmClass{
     private void prepare() throws ConstantPoolException, Descriptor.InvalidDescriptor {
         for(Field i : this.classFile.fields){
             if(i.access_flags.is(AccessFlags.ACC_STATIC)){
-                staticFields.put(i.getName(classFile.constant_pool), new JvmOpcodeStaticField(classFile, i));
+                fields.put(i.getName(classFile.constant_pool), new JvmOpcodeStaticField(this, i));
+            }else{
+                fields.put(i.getName(classFile.constant_pool), new JvmOpcodeObjectField(this, i));
             }
         }
     }
@@ -79,19 +79,19 @@ public class JvmOpcodeClass implements JvmClass{
             inited = true;
             JvmOpcodeMethod method = methods.get(new AbstractMap.SimpleEntry<>("<clinit>", "()V"));
             if(method != null){
-                method.call(env,this);
+                method.call(env, null);
             }
         }
     }
 
     @Override
-    public JvmObject newInstance(Env env) throws InstantiationException, IllegalAccessException {
+    public Object newInstance(Env env) throws InstantiationException, IllegalAccessException {
         try {
             clinit(env);
             //1. 创建
-            JvmOpcodeObject object = new JvmOpcodeObject();
+            JvmOpcodeObject object = new JvmOpcodeObject(this);
             //2. 执行<init>
-            object.init();
+            object.init(env);
             return object;
         } catch (Exception e) {
             throw new InstantiationException(e.getMessage());
@@ -111,18 +111,8 @@ public class JvmOpcodeClass implements JvmClass{
     }
 
     @Override
-    public Object getField(String name, String type, int flags) throws NoSuchFieldException {
-        throw new InternalError("Not Impl");
-    }
-
-    @Override
-    public void putField(Env env, String name, Object value) throws Exception {
-        clinit(env);
-        JvmOpcodeStaticField field = this.staticFields.get(name);
-        if(field == null){
-            throw new NoSuchFieldException(name);
-        }
-        field.putValue(value);
+    public JvmField getField(String name) throws NoSuchFieldException, IllegalAccessException {
+        return null;
     }
 
     public ClassFile getClassFile() {

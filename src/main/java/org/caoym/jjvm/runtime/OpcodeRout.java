@@ -1,14 +1,12 @@
 package org.caoym.jjvm.runtime;
 
 import com.sun.org.apache.bcel.internal.Constants;
-import com.sun.tools.classfile.AccessFlags;
 import com.sun.tools.classfile.ConstantPool;
 import com.sun.tools.classfile.ConstantPoolException;
 import org.caoym.jjvm.lang.JvmClass;
+import org.caoym.jjvm.lang.JvmField;
 import org.caoym.jjvm.lang.JvmMethod;
-import org.caoym.jjvm.lang.JvmObject;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -73,14 +71,10 @@ public enum OpcodeRout {
             ConstantPool.CONSTANT_Fieldref_info info
                     = (ConstantPool.CONSTANT_Fieldref_info)frame.getConstantPool().get(arg);
             //静态字段所在的类
-            JvmClass clazz = env.getVm().findClass(info.getClassName());
+            JvmClass clazz = env.getVm().getClass(info.getClassName());
+            JvmField field = clazz.getField(info.getNameAndTypeInfo().getName());
             //静态字段的值
-            Object value = clazz.getField(
-                    info.getNameAndTypeInfo().getName(),
-                    info.getNameAndTypeInfo().getType(),
-                    AccessFlags.ACC_STATIC
-            );
-
+            Object value = field.get(env,null);
             frame.getOperandStack().push(value, 1);
         }
     },
@@ -119,7 +113,7 @@ public enum OpcodeRout {
             String name = info.getNameAndTypeInfo().getName();
             String type = info.getNameAndTypeInfo().getType();
 
-            JvmClass clazz  = env.getVm().findClass(className);
+            JvmClass clazz  = env.getVm().getClass(className);
             JvmMethod method = clazz.getMethod(name, type, 0);
 
             //从操作数栈中推出方法的参数
@@ -331,7 +325,7 @@ public enum OpcodeRout {
             int index = (operands[0] << 8)| operands[1];
             ConstantPool.CONSTANT_Class_info info
                     = (ConstantPool.CONSTANT_Class_info)frame.getConstantPool().get(index);
-            JvmClass clazz = env.getVm().findClass(info.getName());
+            JvmClass clazz = env.getVm().getClass(info.getName());
             frame.getOperandStack().push(clazz.newInstance(env));
         }
     },
@@ -355,8 +349,9 @@ public enum OpcodeRout {
             ConstantPool.CONSTANT_Fieldref_info info
                     = (ConstantPool.CONSTANT_Fieldref_info)frame.getConstantPool().get(index);
 
-            JvmClass clazz = env.getVm().findClass(info.getClassName());
-            clazz.putField(env, info.getNameAndTypeInfo().getName(), var);
+            JvmClass clazz = env.getVm().getClass(info.getClassName());
+            JvmField field = clazz.getField(info.getNameAndTypeInfo().getName());
+            field.set(env, null, var);
         }
     },
     /**
@@ -366,13 +361,14 @@ public enum OpcodeRout {
         @Override
         public void invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
             Object value = frame.getOperandStack().pop();
-            JvmObject objectref = (JvmObject)frame.getOperandStack().pop();
+            Object objectref = frame.getOperandStack().pop();
 
             int index = (operands[0] << 8)| operands[1];
             ConstantPool.CONSTANT_Fieldref_info info
                     = (ConstantPool.CONSTANT_Fieldref_info)frame.getConstantPool().get(index);
-
-            objectref.putField(info.getNameAndTypeInfo().getName(), value);
+            JvmClass clazz = env.getVm().getClass(info.getClassName());
+            JvmField field = clazz.getField(info.getNameAndTypeInfo().getName());
+            field.set(env,objectref, value);
         }
     },
     /**
@@ -381,13 +377,14 @@ public enum OpcodeRout {
     GETFIELD(Constants.GETFIELD){
         @Override
         public void invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
-            JvmObject objectref = (JvmObject)frame.getOperandStack().pop();
+            Object objectref = frame.getOperandStack().pop();
 
             int index = (operands[0] << 8)| operands[1];
             ConstantPool.CONSTANT_Fieldref_info info
                     = (ConstantPool.CONSTANT_Fieldref_info)frame.getConstantPool().get(index);
-
-            frame.getOperandStack().push(objectref.getField(info.getNameAndTypeInfo().getName()));
+            JvmClass clazz = env.getVm().getClass(info.getClassName());
+            JvmField field = clazz.getField(info.getNameAndTypeInfo().getName());
+            frame.getOperandStack().push(field.get(env, objectref));
         }
     }
     ;

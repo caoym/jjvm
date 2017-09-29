@@ -4,19 +4,20 @@ import com.sun.tools.classfile.ClassFile;
 import com.sun.tools.classfile.ConstantPoolException;
 import com.sun.tools.classfile.Descriptor;
 import com.sun.tools.classfile.Field;
+import org.caoym.jjvm.runtime.Env;
 
 /**
  * 静态成员
  */
-public class JvmOpcodeStaticField {
+public class JvmOpcodeStaticField implements JvmField {
     private final Field field;
-    private final ClassFile classFile;
+    private final JvmOpcodeClass clazz;
     private Object value;
     private final String type;
-    public JvmOpcodeStaticField(ClassFile classFile, Field field) throws Descriptor.InvalidDescriptor, ConstantPoolException {
+    public JvmOpcodeStaticField(JvmOpcodeClass clazz, Field field) throws Descriptor.InvalidDescriptor, ConstantPoolException {
         this.field = field;
-        this.classFile = classFile;
-        type = field.descriptor.getFieldType(this.classFile.constant_pool);
+        this.clazz = clazz;
+        type = field.descriptor.getFieldType(this.clazz.getClassFile().constant_pool);
         //初始化为默认值
         switch (type){
             case "byte":
@@ -49,11 +50,13 @@ public class JvmOpcodeStaticField {
         }
     }
 
-    public Object getValue() {
-        return value;
+    @Override
+    public void set(Env env, Object thiz, Object value) throws IllegalAccessException {
+        this.value = value;
     }
 
-    public void putValue(Object value) {
-        this.value = value;
+    @Override
+    public Object get(Env env, Object thiz) throws IllegalAccessException {
+        return value;
     }
 }

@@ -2,9 +2,10 @@ package org.caoym.jjvm.lang.natives;
 
 import jdk.internal.org.objectweb.asm.Type;
 import org.caoym.jjvm.lang.JvmClass;
+import org.caoym.jjvm.lang.JvmField;
 import org.caoym.jjvm.lang.JvmMethod;
-import org.caoym.jjvm.lang.JvmObject;
 import org.caoym.jjvm.runtime.Env;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -27,8 +28,8 @@ public class JvmNativeClass implements JvmClass {
     }
 
     @Override
-    public JvmObject newInstance(Env env) throws InstantiationException, IllegalAccessException {
-        return new JvmNativeObject(nativeClass.newInstance());
+    public Object newInstance(Env env) throws InstantiationException, IllegalAccessException {
+        return nativeClass.newInstance();
     }
 
     @Override
@@ -45,12 +46,11 @@ public class JvmNativeClass implements JvmClass {
     }
 
     @Override
-    public Object getField(String name, String type, int flags) throws NoSuchFieldException, IllegalAccessException {
-        Field filed = nativeClass.getField(name);
-        return filed.get(nativeClass);
+    public JvmField getField(String name) throws NoSuchFieldException, IllegalAccessException {
+        return new JvmNativeField(this, nativeClass.getField(name));
     }
 
-    @Override
-    public void putField(Env env, String name, Object value) throws NoSuchFieldException, IllegalAccessException {
+    public Class getNativeClass() {
+        return nativeClass;
     }
 }
