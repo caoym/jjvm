@@ -1,6 +1,7 @@
-package org.caoym.jjvm.lang;
+package org.caoym.jjvm.opcode;
 
 import com.sun.tools.classfile.*;
+import org.caoym.jjvm.lang.JvmMethod;
 import org.caoym.jjvm.runtime.*;
 
 /**

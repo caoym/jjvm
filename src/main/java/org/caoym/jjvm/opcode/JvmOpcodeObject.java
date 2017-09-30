@@ -1,9 +1,11 @@
-package org.caoym.jjvm.lang;
+package org.caoym.jjvm.opcode;
 
+import org.caoym.jjvm.lang.JvmMethod;
+import org.caoym.jjvm.lang.JvmObject;
 import org.caoym.jjvm.runtime.Env;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-public class JvmOpcodeObject{
+public class JvmOpcodeObject implements JvmObject{
 
     private JvmOpcodeClass clazz;
     public JvmOpcodeObject(JvmOpcodeClass clazz){
@@ -14,7 +16,7 @@ public class JvmOpcodeObject{
      * @throws Exception
      */
     public void init(Env env)throws Exception{
-        JvmMethod method = clazz.getMethod("<init>", "()V", 0);
+        JvmMethod method = clazz.getMethod("<init>", "()V");
         method.call(env, this);
     }
 

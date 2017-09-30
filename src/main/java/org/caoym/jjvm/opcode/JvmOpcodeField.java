@@ -1,4 +1,4 @@
-package org.caoym.jjvm.lang;
+package org.caoym.jjvm.opcode;
 
 /**
  * Created by caoyangmin on 2017/9/29.

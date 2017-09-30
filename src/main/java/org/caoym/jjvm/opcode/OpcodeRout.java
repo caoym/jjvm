@@ -1,4 +1,4 @@
-package org.caoym.jjvm.runtime;
+package org.caoym.jjvm.opcode;
 
 import com.sun.org.apache.bcel.internal.Constants;
 import com.sun.tools.classfile.ConstantPool;
@@ -6,6 +6,8 @@ import com.sun.tools.classfile.ConstantPoolException;
 import org.caoym.jjvm.lang.JvmClass;
 import org.caoym.jjvm.lang.JvmField;
 import org.caoym.jjvm.lang.JvmMethod;
+import org.caoym.jjvm.runtime.Env;
+import org.caoym.jjvm.runtime.StackFrame;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -67,9 +69,9 @@ public enum OpcodeRout {
     GETSTATIC(Constants.GETSTATIC){
         @Override
         public void invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
-            int arg = (operands[0]<<8)|operands[1];
+            int index = (operands[0]<<8)|operands[1];
             ConstantPool.CONSTANT_Fieldref_info info
-                    = (ConstantPool.CONSTANT_Fieldref_info)frame.getConstantPool().get(arg);
+                    = (ConstantPool.CONSTANT_Fieldref_info)frame.getConstantPool().get(index);
             //静态字段所在的类
             JvmClass clazz = env.getVm().getClass(info.getClassName());
             JvmField field = clazz.getField(info.getNameAndTypeInfo().getName());
@@ -84,7 +86,19 @@ public enum OpcodeRout {
     INVOKESPECIAL(Constants.INVOKESPECIAL){
         @Override
         public void invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
-            throw new InternalError("The opcode invokespecial Not Impl");
+            int arg = (operands[0]<<8)|operands[1];
+
+            ConstantPool.CONSTANT_Methodref_info info
+                    = (ConstantPool.CONSTANT_Methodref_info)frame.getConstantPool().get(arg);
+
+            JvmClass clazz  = env.getVm().getClass(info.getClassName());
+            JvmMethod method = clazz.getMethod(
+                    info.getNameAndTypeInfo().getName(),
+                    info.getNameAndTypeInfo().getType()
+            );
+            //从操作数栈中推出方法的参数
+            Object args[] = frame.getOperandStack().dumpAll();
+            method.call(env, args[0], Arrays.copyOfRange(args,1, args.length));
         }
     },
     /**
@@ -114,7 +128,7 @@ public enum OpcodeRout {
             String type = info.getNameAndTypeInfo().getType();
 
             JvmClass clazz  = env.getVm().getClass(className);
-            JvmMethod method = clazz.getMethod(name, type, 0);
+            JvmMethod method = clazz.getMethod(name, type);
 
             //从操作数栈中推出方法的参数
             Object args[] = frame.getOperandStack().dumpAll();

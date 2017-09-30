@@ -1,4 +1,4 @@
-package org.caoym.jjvm.lang.natives;
+package org.caoym.jjvm.natives;
 
 import org.caoym.jjvm.runtime.Env;
 import org.caoym.jjvm.lang.JvmMethod;

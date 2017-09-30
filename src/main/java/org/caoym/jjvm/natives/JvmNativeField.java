@@ -1,9 +1,7 @@
-package org.caoym.jjvm.lang.natives;
+package org.caoym.jjvm.natives;
 
-import org.caoym.jjvm.lang.JvmClass;
 import org.caoym.jjvm.lang.JvmField;
 import org.caoym.jjvm.runtime.Env;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.lang.reflect.Field;
 

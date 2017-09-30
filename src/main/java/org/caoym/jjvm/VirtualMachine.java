@@ -39,8 +39,7 @@ public class VirtualMachine {
         //找到入口方法
         JvmMethod method = clazz.getMethod(
                 "main",
-                "([Ljava/lang/String;)V",
-                (int)(AccessFlags.JVM_ACC_STATIC|AccessFlags.JVM_ACC_PUBLIC));
+                "([Ljava/lang/String;)V");
         //执行入口方法
         method.call(env, null, (Object[]) args);
     }

@@ -1,11 +1,12 @@
-package org.caoym.jjvm.lang;
+package org.caoym.jjvm.opcode;
 
+import org.caoym.jjvm.lang.JvmField;
 import org.caoym.jjvm.runtime.Env;
 import com.sun.tools.classfile.Field;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 
-public class JvmOpcodeObjectField implements JvmField{
+public class JvmOpcodeObjectField implements JvmField {
     private JvmOpcodeClass clazz;
     private Field field;
 

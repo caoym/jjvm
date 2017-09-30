@@ -1,15 +1,15 @@
-package org.caoym.jjvm.lang.natives;
+package org.caoym.jjvm.natives;
 
 import jdk.internal.org.objectweb.asm.Type;
 import org.caoym.jjvm.lang.JvmClass;
 import org.caoym.jjvm.lang.JvmField;
 import org.caoym.jjvm.lang.JvmMethod;
 import org.caoym.jjvm.runtime.Env;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.AbstractMap;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 包装 native 类
@@ -17,30 +17,28 @@ import java.util.HashMap;
 public class JvmNativeClass implements JvmClass {
 
     private Class nativeClass;
-    private HashMap<String, JvmNativeMethod> methods = new HashMap<>();
+    private HashMap<Map.Entry<String, String>, JvmNativeMethod> methods = new HashMap<>();
 
     public JvmNativeClass(Class nativeClass){
         this.nativeClass = nativeClass;
         for (Method method : nativeClass.getMethods()) {
-            String key = method.getName()+":"+Type.getMethodDescriptor(method);
-            methods.put(key, new JvmNativeMethod(method));
+            methods.put(
+                    new AbstractMap.SimpleEntry<>(method.getName(), Type.getMethodDescriptor(method)),
+                    new JvmNativeMethod(method)
+            );
         }
     }
 
     @Override
     public Object newInstance(Env env) throws InstantiationException, IllegalAccessException {
-        return nativeClass.newInstance();
+        return new JvmNativeObject(this);
     }
 
     @Override
-    public JvmMethod getMethod(String name, String desc, int flags) throws NoSuchMethodException {
-        JvmNativeMethod found = methods.get(name+":"+desc);
+    public JvmMethod getMethod(String name, String desc) throws NoSuchMethodException {
+        JvmNativeMethod found = methods.get(new AbstractMap.SimpleEntry<>(name, desc));
         if(found == null){
             throw new NoSuchMethodException(name+":"+desc+" not exist");
-        }
-        int modifiers = found.getNativeMethod().getModifiers();
-        if((modifiers|flags) != modifiers){
-            throw new NoSuchMethodException(name+":"+desc+" with flags not exist");
         }
         return found;
     }

@@ -1,7 +1,16 @@
 package org.caoym.jjvm.natives;
 
-/**
- * Created by caoyangmin on 2017/9/29.
- */
-public class JvmnativeObject {
+import org.caoym.jjvm.lang.JvmObject;
+
+public class JvmNativeObject implements JvmObject{
+
+    private Object object;
+    private final JvmNativeClass clazz;
+
+    public JvmNativeObject(JvmNativeClass clazz){
+        this.clazz = clazz;
+    }
+    public Object getNativeObject() {
+        return object;
+    }
 }

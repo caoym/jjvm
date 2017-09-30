@@ -1,6 +1,9 @@
-package org.caoym.jjvm.lang;
+package org.caoym.jjvm.opcode;
 
 import com.sun.tools.classfile.*;
+import org.caoym.jjvm.lang.JvmClass;
+import org.caoym.jjvm.lang.JvmField;
+import org.caoym.jjvm.lang.JvmMethod;
 import org.caoym.jjvm.runtime.Env;
 
 import java.io.IOException;
@@ -12,7 +15,7 @@ import java.util.Map;
 /**
  * 字节码定义的 Java 类( 区别于 native 类 )
  */
-public class JvmOpcodeClass implements JvmClass{
+public class JvmOpcodeClass implements JvmClass {
 
     private final ClassFile classFile;
     private Map<Map.Entry<String, String>, JvmOpcodeMethod> methods = new HashMap<>();
@@ -88,24 +91,17 @@ public class JvmOpcodeClass implements JvmClass{
     public Object newInstance(Env env) throws InstantiationException, IllegalAccessException {
         try {
             clinit(env);
-            //1. 创建
-            JvmOpcodeObject object = new JvmOpcodeObject(this);
-            //2. 执行<init>
-            object.init(env);
-            return object;
         } catch (Exception e) {
             throw new InstantiationException(e.getMessage());
         }
+        return new JvmOpcodeObject(this);
     }
 
     @Override
-    public JvmMethod getMethod(String name, String desc, int flags) throws NoSuchMethodException {
+    public JvmMethod getMethod(String name, String desc) throws NoSuchMethodException {
         JvmOpcodeMethod method = methods.get(new AbstractMap.SimpleEntry<>(name, desc));
         if(method == null){
             throw new NoSuchMethodException("method "+name+":"+ desc+" not exist");
-        }
-        if(!method.getAccessFlags().is(flags)){
-            throw new NoSuchMethodException("method "+name+":"+ desc+" invalid AccessFlags");
         }
         return method;
     }

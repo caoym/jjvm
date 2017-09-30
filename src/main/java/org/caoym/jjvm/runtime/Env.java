@@ -1,15 +1,9 @@
 package org.caoym.jjvm.runtime;
-
-import com.sun.tools.classfile.ConstantPoolException;
 import org.caoym.jjvm.VirtualMachine;
 
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Hashtable;
 
 /**
- * Created by caoyangmin on 2017/9/5.
+ * 线程上下文
  */
 public class Env {
     /**

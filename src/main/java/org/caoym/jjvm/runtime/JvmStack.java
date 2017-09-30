@@ -1,6 +1,7 @@
 package org.caoym.jjvm.runtime;
 
 import com.sun.tools.classfile.ConstantPool;
+import org.caoym.jjvm.opcode.OpcodeInvoker;
 
 /**
  * 虚拟机栈

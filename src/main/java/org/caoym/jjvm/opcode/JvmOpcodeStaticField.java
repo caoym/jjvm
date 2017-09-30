@@ -1,9 +1,9 @@
-package org.caoym.jjvm.lang;
+package org.caoym.jjvm.opcode;
 
-import com.sun.tools.classfile.ClassFile;
 import com.sun.tools.classfile.ConstantPoolException;
 import com.sun.tools.classfile.Descriptor;
 import com.sun.tools.classfile.Field;
+import org.caoym.jjvm.lang.JvmField;
 import org.caoym.jjvm.runtime.Env;
 
 /**
