@@ -6,6 +6,7 @@ import com.sun.tools.classfile.ConstantPoolException;
 import org.caoym.jjvm.lang.JvmClass;
 import org.caoym.jjvm.lang.JvmField;
 import org.caoym.jjvm.lang.JvmMethod;
+import org.caoym.jjvm.lang.JvmObject;
 import org.caoym.jjvm.runtime.Env;
 import org.caoym.jjvm.runtime.StackFrame;
 
@@ -98,7 +99,13 @@ public enum OpcodeRout {
             ArrayList<Object> args = frame.getOperandStack().multiPop(method.getParameterCount() + 1);
             Collections.reverse(args);
             Object[] argsArr = args.toArray();
-            method.call(env, argsArr[0], Arrays.copyOfRange(argsArr,1, argsArr.length));
+            JvmObject thiz = (JvmObject) argsArr[0];
+
+            //根据类名确定是调用父类还是子类
+            while (!thiz.getClazz().getName().equals(clazz.getName())){
+                thiz = thiz.getSuper();
+            }
+            method.call(env, thiz, Arrays.copyOfRange(argsArr,1, argsArr.length));
         }
     },
     /**
@@ -384,6 +391,7 @@ public enum OpcodeRout {
                     = (ConstantPool.CONSTANT_Fieldref_info)frame.getConstantPool().get(index);
             JvmClass clazz = env.getVm().getClass(info.getClassName());
             JvmField field = clazz.getField(info.getNameAndTypeInfo().getName());
+            assert field != null;
             field.set(env,objectref, value);
         }
     },

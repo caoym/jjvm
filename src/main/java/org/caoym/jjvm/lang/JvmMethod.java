@@ -11,4 +11,6 @@ public interface JvmMethod {
     public void call(Env env, Object thiz, Object ...args) throws Exception;
 
     public int getParameterCount();
+
+    public String getName();
 }

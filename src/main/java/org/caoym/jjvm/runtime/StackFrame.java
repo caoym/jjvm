@@ -1,6 +1,8 @@
 package org.caoym.jjvm.runtime;
 
 import com.sun.tools.classfile.ConstantPool;
+import org.caoym.jjvm.lang.JvmClass;
+import org.caoym.jjvm.lang.JvmMethod;
 import org.caoym.jjvm.opcode.OpcodeInvoker;
 
 /**
@@ -38,8 +40,10 @@ public class StackFrame {
     private Object returnVal;
     private String returnType;
     private boolean isReturned = false;
+    private final JvmClass clazz;
+    private final JvmMethod method;
 
-    StackFrame(ConstantPool constantPool,
+    StackFrame(JvmClass clazz,JvmMethod method, ConstantPool constantPool,
                       OpcodeInvoker[] opcodes,
                       int variables,
                       int stackSize) {
@@ -47,6 +51,8 @@ public class StackFrame {
         this.opcodes = opcodes;
         this.operandStack = new SlotsStack<>(stackSize);
         this.localVariables = new Slots<>(variables);
+        this.clazz = clazz;
+        this.method = method;
     }
 
     public Slots<Object> getLocalVariables() {
@@ -90,5 +96,13 @@ public class StackFrame {
     }
     public OpcodeInvoker[] getOpcodes() {
         return opcodes;
+    }
+
+    public JvmClass getCurrentClass() {
+        return clazz;
+    }
+
+    public JvmMethod getCurrentMethod() {
+        return method;
     }
 }

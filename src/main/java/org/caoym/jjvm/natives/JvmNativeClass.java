@@ -1,9 +1,7 @@
 package org.caoym.jjvm.natives;
 
 import jdk.internal.org.objectweb.asm.Type;
-import org.caoym.jjvm.lang.JvmClass;
-import org.caoym.jjvm.lang.JvmField;
-import org.caoym.jjvm.lang.JvmMethod;
+import org.caoym.jjvm.lang.*;
 import org.caoym.jjvm.runtime.Env;
 
 import java.lang.reflect.Constructor;
@@ -17,16 +15,20 @@ import java.util.Map;
  */
 public class JvmNativeClass implements JvmClass {
 
-    private Class nativeClass;
-    private HashMap<Map.Entry<String, String>, JvmMethod> methods = new HashMap<>();
+    private final Class nativeClass;
+    private final String className;
+    private final JvmClassLoader classLoader;
+    private final HashMap<Map.Entry<String, String>, JvmMethod> methods = new HashMap<>();
 
-    public JvmNativeClass(Class nativeClass){
+    public JvmNativeClass(JvmClassLoader classLoader, Class nativeClass){
         this.nativeClass = nativeClass;
+        this.classLoader = classLoader;
+        this.className = nativeClass.getName();
         //普通方法
         for (Method method : nativeClass.getMethods()) {
             methods.put(
                     new AbstractMap.SimpleEntry<>(method.getName(), Type.getMethodDescriptor(method)),
-                    new JvmNativeMethod(method)
+                    new JvmNativeMethod(this, method)
             );
         }
         //构造方法
@@ -39,7 +41,7 @@ public class JvmNativeClass implements JvmClass {
     }
 
     @Override
-    public Object newInstance(Env env) throws InstantiationException, IllegalAccessException {
+    public JvmObject newInstance(Env env) throws InstantiationException, IllegalAccessException {
         return new JvmNativeObject(this);
     }
 
@@ -61,6 +63,21 @@ public class JvmNativeClass implements JvmClass {
     @Override
     public JvmField getField(String name) throws NoSuchFieldException, IllegalAccessException {
         return new JvmNativeField(this, nativeClass.getField(name));
+    }
+
+    @Override
+    public JvmClassLoader getClassLoader() {
+        return classLoader;
+    }
+
+    @Override
+    public JvmClass getSuperClass() throws ClassNotFoundException {
+        return classLoader.loadClass(nativeClass.getSuperclass().getName());
+    }
+
+    @Override
+    public String getName() {
+        return className;
     }
 
     public Class getNativeClass() {

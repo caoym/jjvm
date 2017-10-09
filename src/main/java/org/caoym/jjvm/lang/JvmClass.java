@@ -8,12 +8,12 @@ import org.caoym.jjvm.runtime.Env;
 public interface JvmClass {
 
     /**
-     * 创建实例
+     * 分配实例的内存空间，但不执行实例的构造函数
      * @return
      * @throws InstantiationException
      * @throws IllegalAccessException
      */
-    public Object newInstance(Env env) throws InstantiationException, IllegalAccessException;
+    public JvmObject newInstance(Env env) throws InstantiationException, IllegalAccessException;
     /**
      * 获取方法
      * @param name 方法名，如`main`
@@ -37,4 +37,20 @@ public interface JvmClass {
      * @throws NoSuchFieldException
      */
     public JvmField getField(String name) throws NoSuchFieldException, IllegalAccessException;
+
+    /**
+     * 获取当前类的 class loader
+     * @return
+     */
+    public JvmClassLoader getClassLoader();
+
+    /**
+     * 返回父类
+     */
+    public JvmClass getSuperClass() throws ClassNotFoundException;
+
+    /**
+     * 返回类名
+     */
+    public String getName();
 }

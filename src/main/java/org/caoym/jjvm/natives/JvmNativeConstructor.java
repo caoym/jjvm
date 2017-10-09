@@ -29,4 +29,9 @@ public class JvmNativeConstructor implements JvmMethod {
     public int getParameterCount() {
         return constructor.getParameterCount();
     }
+
+    @Override
+    public String getName() {
+        return "<init>";
+    }
 }

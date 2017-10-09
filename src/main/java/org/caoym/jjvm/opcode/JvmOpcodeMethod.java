@@ -13,8 +13,9 @@ public class JvmOpcodeMethod implements JvmMethod {
     private final Method method;
     private final OpcodeInvoker[] opcodes;
     private final Code_attribute codeAttribute;
-    private final String methodName;
+    private final String name;
     private final int parameterCount;
+
 
     public JvmOpcodeMethod(JvmOpcodeClass clazz, Method method) throws ConstantPoolException, Descriptor.InvalidDescriptor {
         this.clazz = clazz;
@@ -24,7 +25,7 @@ public class JvmOpcodeMethod implements JvmMethod {
         String temp = "";
         temp = method.getName(clazz.getClassFile().constant_pool);
         parameterCount = method.descriptor.getParameterCount(clazz.getClassFile().constant_pool);
-        methodName = temp;
+        name = temp;
     }
 
     /**
@@ -37,6 +38,8 @@ public class JvmOpcodeMethod implements JvmMethod {
         // 出栈，并将返回值（如果有）推入上一个栈帧的操作数栈
 
         StackFrame frame = env.getStack().newFrame(
+                clazz,
+                this,
                 clazz.getClassFile().constant_pool,
                 opcodes,
                 codeAttribute.max_locals,
@@ -63,6 +66,11 @@ public class JvmOpcodeMethod implements JvmMethod {
     @Override
     public int getParameterCount() {
         return parameterCount;
+    }
+
+    @Override
+    public String getName() {
+        return name;
     }
 
     public AccessFlags getAccessFlags() {

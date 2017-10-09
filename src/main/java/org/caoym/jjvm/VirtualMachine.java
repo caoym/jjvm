@@ -1,9 +1,9 @@
 package org.caoym.jjvm;
 
 import org.caoym.jjvm.lang.JvmClass;
+import org.caoym.jjvm.lang.JvmClassLoader;
 import org.caoym.jjvm.lang.JvmMethod;
 import org.caoym.jjvm.runtime.Env;
-import sun.jvm.hotspot.oops.AccessFlags;
 
 import java.nio.file.Path;
 import java.util.Hashtable;
@@ -25,7 +25,7 @@ public class VirtualMachine {
     private Hashtable<String, JvmClass> methodArea = new Hashtable<String, JvmClass>();
 
     public VirtualMachine(Path classPath, String initialClass){
-        classLoader = new JvmClassLoader(classPath);
+        classLoader = new JvmDefaultClassLoader(classPath);
         this.initialClass = initialClass;
     }
     /**

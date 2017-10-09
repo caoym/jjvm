@@ -1,6 +1,8 @@
 package org.caoym.jjvm.natives;
 
+import org.caoym.jjvm.lang.JvmClass;
 import org.caoym.jjvm.lang.JvmObject;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class JvmNativeObject implements JvmObject{
 
@@ -17,5 +19,15 @@ public class JvmNativeObject implements JvmObject{
 
     public void setNativeObject(Object object) {
         this.object = object;
+    }
+
+    @Override
+    public JvmObject getSuper() {
+        throw new NotImplementedException();
+    }
+
+    @Override
+    public JvmClass getClazz() {
+        return clazz;
     }
 }

@@ -1,9 +1,7 @@
 package org.caoym.jjvm.opcode;
 
 import com.sun.tools.classfile.*;
-import org.caoym.jjvm.lang.JvmClass;
-import org.caoym.jjvm.lang.JvmField;
-import org.caoym.jjvm.lang.JvmMethod;
+import org.caoym.jjvm.lang.*;
 import org.caoym.jjvm.runtime.Env;
 
 import java.io.IOException;
@@ -19,6 +17,7 @@ public class JvmOpcodeClass implements JvmClass {
 
     private final ClassFile classFile;
     private final String className;
+    private final JvmClassLoader classLoader;
     private Map<Map.Entry<String, String>, JvmOpcodeMethod> methods = new HashMap<>();
     private Map<String, JvmField> fields = new HashMap<>();
     /**
@@ -26,9 +25,9 @@ public class JvmOpcodeClass implements JvmClass {
      */
     boolean inited = false;
 
-    static public JvmOpcodeClass read(Path path) throws ClassNotFoundException {
+    static public JvmOpcodeClass read(JvmClassLoader classLoader, Path path) throws ClassNotFoundException {
         try {
-            return  new JvmOpcodeClass(ClassFile.read(path));
+            return  new JvmOpcodeClass(classLoader, ClassFile.read(path));
         } catch (IOException e) {
             throw new ClassNotFoundException(e.toString());
         } catch (Exception e) {
@@ -36,13 +35,14 @@ public class JvmOpcodeClass implements JvmClass {
         }
     }
     /**
-     *
+     * @param classLoader
      * @param classFile
      * @throws ConstantPoolException
      */
-    private JvmOpcodeClass(ClassFile classFile) throws ConstantPoolException, Descriptor.InvalidDescriptor {
+    private JvmOpcodeClass(JvmClassLoader classLoader, ClassFile classFile) throws ConstantPoolException, Descriptor.InvalidDescriptor {
         this.classFile = classFile;
         this.className = classFile.getName();
+        this.classLoader = classLoader;
         for (Method method : classFile.methods) {
             String name = method.getName(classFile.constant_pool);
             String desc = method.descriptor.getValue(classFile.constant_pool);
@@ -90,13 +90,13 @@ public class JvmOpcodeClass implements JvmClass {
     }
 
     @Override
-    public Object newInstance(Env env) throws InstantiationException, IllegalAccessException {
+    public JvmObject newInstance(Env env) throws InstantiationException, IllegalAccessException {
         try {
             clinit(env);
         } catch (Exception e) {
             throw new InstantiationException(e.getMessage());
         }
-        return new JvmOpcodeObject(this);
+        return new JvmOpcodeObject(env, this);
     }
 
     @Override
@@ -116,7 +116,30 @@ public class JvmOpcodeClass implements JvmClass {
 
     @Override
     public JvmField getField(String name) throws NoSuchFieldException, IllegalAccessException {
-        return null;
+        JvmField field = fields.get(name);
+        if(field == null){
+            throw new NoSuchFieldException("field "+name+" of "+ className+" not exist");
+        }
+        return field;
+    }
+
+    @Override
+    public JvmClassLoader getClassLoader() {
+        return classLoader;
+    }
+
+    @Override
+    public JvmClass getSuperClass() throws ClassNotFoundException {
+        try {
+            return classLoader.loadClass(classFile.getSuperclassName());
+        } catch (ConstantPoolException e) {
+            throw new ClassNotFoundException(e.getMessage());
+        }
+    }
+
+    @Override
+    public String getName() {
+        return className;
     }
 
     public ClassFile getClassFile() {

@@ -36,6 +36,7 @@ public class BytecodeInterpreter {
             }
             OpcodeInvoker[] codes = frame.getOpcodes();
             int pc = frame.increasePC();
+            System.out.println("$ "+ frame.getCurrentClass().getName() + "."+frame.getCurrentMethod().getName()+"@"+pc);
             codes[pc].invoke(env, frame);
         }
     }
