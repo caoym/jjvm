@@ -12,7 +12,7 @@ import java.nio.file.Paths;
  * 虚拟机的引导类加载器
  *
  */
-public class JvmClassLoader {
+public class JvmBootsClassLoader {
 
     /**
      * 类搜索路径
