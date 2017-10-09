@@ -26,12 +26,11 @@ public class BytecodeInterpreter {
         while ((frame = stack.currentFrame()) != null){
             //如果栈帧被设置为返回，则将其返回值推入上一个栈帧的操作数栈
             if(frame.isReturned()){
+                StackFrame oldFrame = frame;
                 stack.popFrame();
-                if(!"void".equals(frame.getReturnType())){
-                    frame = stack.currentFrame();
-                    if(frame != null){
-                        frame.getOperandStack().push(frame.getReturn());
-                    }
+                frame = stack.currentFrame();
+                if(frame != null && !"void".equals(oldFrame.getReturnType())){
+                    frame.getOperandStack().push(oldFrame.getReturn());
                 }
                 continue;
             }

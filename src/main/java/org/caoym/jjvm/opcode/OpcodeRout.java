@@ -9,9 +9,7 @@ import org.caoym.jjvm.lang.JvmMethod;
 import org.caoym.jjvm.runtime.Env;
 import org.caoym.jjvm.runtime.StackFrame;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 操作数例程
@@ -97,8 +95,10 @@ public enum OpcodeRout {
                     info.getNameAndTypeInfo().getType()
             );
             //从操作数栈中推出方法的参数
-            Object args[] = frame.getOperandStack().dumpAll();
-            method.call(env, args[0], Arrays.copyOfRange(args,1, args.length));
+            ArrayList<Object> args = frame.getOperandStack().multiPop(method.getParameterCount() + 1);
+            Collections.reverse(args);
+            Object[] argsArr = args.toArray();
+            method.call(env, argsArr[0], Arrays.copyOfRange(argsArr,1, argsArr.length));
         }
     },
     /**
@@ -131,8 +131,10 @@ public enum OpcodeRout {
             JvmMethod method = clazz.getMethod(name, type);
 
             //从操作数栈中推出方法的参数
-            Object args[] = frame.getOperandStack().dumpAll();
-            method.call(env, args[0], Arrays.copyOfRange(args,1, args.length));
+            ArrayList<Object> args = frame.getOperandStack().multiPop(method.getParameterCount() + 1);
+            Collections.reverse(args);
+            Object[] argsArr = args.toArray();
+            method.call(env, argsArr[0], Arrays.copyOfRange(argsArr,1, argsArr.length));
         }
     },
     /**

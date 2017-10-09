@@ -9,16 +9,22 @@ import org.caoym.jjvm.runtime.*;
  */
 public class JvmOpcodeMethod implements JvmMethod {
 
-    private JvmOpcodeClass clazz;
-    private Method method;
-    private OpcodeInvoker[] opcodes;
-    private Code_attribute codeAttribute;
+    private final JvmOpcodeClass clazz;
+    private final Method method;
+    private final OpcodeInvoker[] opcodes;
+    private final Code_attribute codeAttribute;
+    private final String methodName;
+    private final int parameterCount;
 
-    public JvmOpcodeMethod(JvmOpcodeClass clazz, Method method) {
+    public JvmOpcodeMethod(JvmOpcodeClass clazz, Method method) throws ConstantPoolException, Descriptor.InvalidDescriptor {
         this.clazz = clazz;
         this.method = method;
         codeAttribute = (Code_attribute)method.attributes.get("Code");
         opcodes = BytecodeInterpreter.parseCodes(codeAttribute.code);
+        String temp = "";
+        temp = method.getName(clazz.getClassFile().constant_pool);
+        parameterCount = method.descriptor.getParameterCount(clazz.getClassFile().constant_pool);
+        methodName = temp;
     }
 
     /**
@@ -52,6 +58,11 @@ public class JvmOpcodeMethod implements JvmMethod {
         }
 
         BytecodeInterpreter.run(env);
+    }
+
+    @Override
+    public int getParameterCount() {
+        return parameterCount;
     }
 
     public AccessFlags getAccessFlags() {

@@ -24,6 +24,13 @@ public interface JvmClass {
     public JvmMethod getMethod(String name, String desc) throws NoSuchMethodException;
 
     /**
+     * 获取方法
+     * @param name 方法名，如`main`
+     * @param desc 方法类型描述，如`([Ljava/lang/String;)V`
+     */
+    public boolean hasMethod(String name, String desc);
+
+    /**
      * 获取属性
      * @param name 属性名
      * @return

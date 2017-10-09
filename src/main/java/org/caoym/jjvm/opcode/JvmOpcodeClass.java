@@ -18,6 +18,7 @@ import java.util.Map;
 public class JvmOpcodeClass implements JvmClass {
 
     private final ClassFile classFile;
+    private final String className;
     private Map<Map.Entry<String, String>, JvmOpcodeMethod> methods = new HashMap<>();
     private Map<String, JvmField> fields = new HashMap<>();
     /**
@@ -41,6 +42,7 @@ public class JvmOpcodeClass implements JvmClass {
      */
     private JvmOpcodeClass(ClassFile classFile) throws ConstantPoolException, Descriptor.InvalidDescriptor {
         this.classFile = classFile;
+        this.className = classFile.getName();
         for (Method method : classFile.methods) {
             String name = method.getName(classFile.constant_pool);
             String desc = method.descriptor.getValue(classFile.constant_pool);
@@ -104,6 +106,12 @@ public class JvmOpcodeClass implements JvmClass {
             throw new NoSuchMethodException("method "+name+":"+ desc+" not exist");
         }
         return method;
+    }
+
+    @Override
+    public boolean hasMethod(String name, String desc) {
+        JvmOpcodeMethod method = methods.get(new AbstractMap.SimpleEntry<>(name, desc));
+        return method != null;
     }
 
     @Override

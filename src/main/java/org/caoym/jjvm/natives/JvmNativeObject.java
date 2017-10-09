@@ -10,7 +10,12 @@ public class JvmNativeObject implements JvmObject{
     public JvmNativeObject(JvmNativeClass clazz){
         this.clazz = clazz;
     }
+
     public Object getNativeObject() {
         return object;
+    }
+
+    public void setNativeObject(Object object) {
+        this.object = object;
     }
 }

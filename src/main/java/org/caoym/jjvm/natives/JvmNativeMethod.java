@@ -24,6 +24,11 @@ public class JvmNativeMethod implements JvmMethod {
         frame.setReturn(res, method.getReturnType().getName());
     }
 
+    @Override
+    public int getParameterCount() {
+        return method.getParameterCount();
+    }
+
     public Method getNativeMethod() {
         return method;
     }
