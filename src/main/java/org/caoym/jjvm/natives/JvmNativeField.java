@@ -10,19 +10,21 @@ import java.lang.reflect.Field;
  */
 public class JvmNativeField implements JvmField{
 
-    JvmNativeClass nativeClass;
+    JvmNativeClass clazz;
     Field filed;
     public JvmNativeField(JvmNativeClass nativeClass, Field field){
-        this.nativeClass = nativeClass;
+        this.clazz = nativeClass;
         this.filed = field;
     }
     @Override
     public Object get(Env env, Object thiz) throws IllegalAccessException {
-        return filed.get(thiz);
+        // 非基础类型，需要用JvmNativeObject包装
+        return JvmNativeObject.wrap(filed.get(thiz), filed.getType(), clazz.getClassLoader());
     }
 
     @Override
     public void set(Env env, Object thiz,  Object value) throws IllegalAccessException {
-        filed.set(thiz, value);
+        // 去掉JvmNativeObject包装
+        filed.set(thiz, JvmNativeObject.unwrap(value));
     }
 }

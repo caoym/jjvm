@@ -32,8 +32,6 @@ public class JvmOpcodeMethod implements JvmMethod {
      * 解释执行方法的字节码
      */
     public void call(Env env, Object thiz, Object ...args) throws Exception {
-        // 执行方法前确保类已经初始化
-        clazz.clinit(env);
         // 每次方法调用都产生一个新的栈帧，当前方法返回后，将其（栈帧）设置为已返回，BytecodeInterpreter.run会在检查到返回后，将栈帧推
         // 出栈，并将返回值（如果有）推入上一个栈帧的操作数栈
 
@@ -60,6 +58,8 @@ public class JvmOpcodeMethod implements JvmMethod {
             locals.set(pos++, arg, 1);
         }
 
+        // 执行方法前确保类已经初始化
+        clazz.clinit(env);
         BytecodeInterpreter.run(env);
     }
 
@@ -72,8 +72,8 @@ public class JvmOpcodeMethod implements JvmMethod {
     public String getName() {
         return name;
     }
-
-    public AccessFlags getAccessFlags() {
-        return method.access_flags;
+    public byte getCode(int pc){
+        Code_attribute codeAttribute = (Code_attribute)method.attributes.get("Code");
+        return codeAttribute.code[pc];
     }
 }

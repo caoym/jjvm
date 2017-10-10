@@ -23,7 +23,8 @@ public enum OpcodeRout {
     ALOAD_0(Constants.ALOAD_0){
         @Override
         public void invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
-            frame.getOperandStack().push(frame.getLocalVariables().get(0), 1);
+            Object object = frame.getLocalVariables().get(0);
+            frame.getOperandStack().push(object, 1);
         }
     },
     /**
@@ -436,16 +437,21 @@ public enum OpcodeRout {
     }
 
     static private Object asObject(ConstantPool.CPInfo info) throws ConstantPoolException {
+        Object res = null;
         switch (info.getTag()){
             case ConstantPool.CONSTANT_Integer:
-                return ((ConstantPool.CONSTANT_Integer_info) info).value;
+                res = ((ConstantPool.CONSTANT_Integer_info) info).value;
+                break;
             case ConstantPool.CONSTANT_Float:
-                return ((ConstantPool.CONSTANT_Float_info) info).value;
+                res = ((ConstantPool.CONSTANT_Float_info) info).value;
+                break;
             case ConstantPool.CONSTANT_String:
-                return ((ConstantPool.CONSTANT_String_info)info).getString();
+                res = ((ConstantPool.CONSTANT_String_info)info).getString();
+                break;
             default:
                 throw new InternalError("unknown type: "+info.getTag());
         }
+        return res;
     }
 
     static {

@@ -1,6 +1,7 @@
 package org.caoym.jjvm.opcode;
 
 import com.sun.org.apache.bcel.internal.Constants;
+import org.caoym.jjvm.natives.JvmNativeObject;
 import org.caoym.jjvm.runtime.Env;
 import org.caoym.jjvm.runtime.JvmStack;
 import org.caoym.jjvm.runtime.StackFrame;
@@ -36,7 +37,16 @@ public class BytecodeInterpreter {
             }
             OpcodeInvoker[] codes = frame.getOpcodes();
             int pc = frame.increasePC();
-            System.out.println("$ "+ frame.getCurrentClass().getName() + "."+frame.getCurrentMethod().getName()+"@"+pc);
+            StringBuilder sb = new StringBuilder();
+            sb.append("> ");
+            sb.append(frame.getCurrentClass().getName());
+            sb.append(".");
+            sb.append(frame.getCurrentMethod().getName());
+            sb.append("@");
+            sb.append(pc);
+            sb.append(":");
+            sb.append(codes[pc]);
+            System.out.println(sb);
             codes[pc].invoke(env, frame);
         }
     }
@@ -45,10 +55,19 @@ public class BytecodeInterpreter {
         ArrayList<OpcodeInvoker> opcodes = new ArrayList<>();
         for(int i=0; i<codes.length; i++){
             short code = (short)(0xff&codes[i]);
-            OpcodeRout route = OpcodeRout.valueOf(code);
+            final OpcodeRout route = OpcodeRout.valueOf(code);
             short noOfOperands = Constants.NO_OF_OPERANDS[code];
             byte[] operands = Arrays.copyOfRange(codes, i + 1, i + 1 + noOfOperands);
-            opcodes.add( (Env env, StackFrame frame)->route.invoke(env, frame, operands) );
+            opcodes.add(new OpcodeInvoker() {
+                @Override
+                public void invoke(Env env, StackFrame frame) throws Exception {
+                    route.invoke(env, frame, operands);
+                }
+                @Override
+                public String toString() {
+                    return route.name();
+                }
+            });
             i += noOfOperands;
         }
         return Arrays.copyOf(opcodes.toArray(), opcodes.size(), OpcodeInvoker[].class);

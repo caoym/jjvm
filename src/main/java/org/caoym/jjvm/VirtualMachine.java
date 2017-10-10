@@ -41,7 +41,7 @@ public class VirtualMachine {
                 "main",
                 "([Ljava/lang/String;)V");
         //执行入口方法
-        method.call(env, null, (Object[]) args);
+        method.call(env, null, new Object[]{args});
     }
 
     public JvmClass getClass(String className) throws ClassNotFoundException {

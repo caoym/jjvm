@@ -51,7 +51,7 @@ public class JvmOpcodeObject implements JvmObject{
                 case "short":
                     value = (short)0;
                     break;
-                case "value":
+                case "boolean":
                     value = false;
                     break;
                 default:

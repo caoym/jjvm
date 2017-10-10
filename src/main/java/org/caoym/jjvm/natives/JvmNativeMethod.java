@@ -6,6 +6,7 @@ import org.caoym.jjvm.lang.JvmMethod;
 import org.caoym.jjvm.runtime.StackFrame;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 
 /**
  * 包装 native 方法
@@ -23,8 +24,12 @@ public class JvmNativeMethod implements JvmMethod {
     }
     @Override
     public void call(Env env, Object thiz, Object... args) throws Exception {
+        assert thiz instanceof JvmNativeObject;
         StackFrame frame = env.getStack().newFrame(clazz, this);
-        Object res = method.invoke(thiz, args);
+        Object object = ((JvmNativeObject) thiz).getNativeObject();
+        Object res = method.invoke(object, JvmNativeObject.multiUnwrap(args));
+        // 非基础类型，需要用JvmNativeObject包装
+        res = JvmNativeObject.wrap(res, method.getReturnType(), clazz.getClassLoader());
         //将返回值推入调用者的操作数栈
         frame.setReturn(res, method.getReturnType().getName());
     }
