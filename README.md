@@ -21,7 +21,7 @@ public class HelloWorld {
 可以通过以下命令运行：
 
 ```shell
-$ java org.caoym.jjvm.JJvm org.caoym.HelloWorld
+$ java /home/myclasspath org.caoym.jjvm.JJvm org.caoym.HelloWorld
 Hello World
 ```
 

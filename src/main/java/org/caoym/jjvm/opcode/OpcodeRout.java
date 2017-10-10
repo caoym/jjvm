@@ -126,23 +126,7 @@ public enum OpcodeRout {
     INVOKEVIRTUAL(Constants.INVOKEVIRTUAL){
         @Override
         public void invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
-            int arg = (operands[0]<<8)|operands[1];
-
-            ConstantPool.CONSTANT_Methodref_info info
-                    = (ConstantPool.CONSTANT_Methodref_info)frame.getConstantPool().get(arg);
-
-            String className = info.getClassName();
-            String name = info.getNameAndTypeInfo().getName();
-            String type = info.getNameAndTypeInfo().getType();
-
-            JvmClass clazz  = env.getVm().getClass(className);
-            JvmMethod method = clazz.getMethod(name, type);
-
-            //从操作数栈中推出方法的参数
-            ArrayList<Object> args = frame.getOperandStack().multiPop(method.getParameterCount() + 1);
-            Collections.reverse(args);
-            Object[] argsArr = args.toArray();
-            method.call(env, argsArr[0], Arrays.copyOfRange(argsArr,1, argsArr.length));
+            INVOKESPECIAL.invoke(env, frame, operands);
         }
     },
     /**
@@ -410,6 +394,48 @@ public enum OpcodeRout {
             JvmClass clazz = env.getVm().getClass(info.getClassName());
             JvmField field = clazz.getField(info.getNameAndTypeInfo().getName());
             frame.getOperandStack().push(field.get(env, objectref));
+        }
+    },
+    /**
+     * 调用接口方法
+     */
+    INVOKEINTERFACE(Constants.INVOKEINTERFACE){
+        @Override
+        public void invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
+
+            // 获取接口和方法信息
+            int arg = (operands[0]<<8)|operands[1];
+
+            ConstantPool.CONSTANT_InterfaceMethodref_info info
+                    = (ConstantPool.CONSTANT_InterfaceMethodref_info)frame.getConstantPool().get(arg);
+
+            String interfaceName = info.getClassName();
+            String name = info.getNameAndTypeInfo().getName();
+            String type = info.getNameAndTypeInfo().getType();
+
+            // 获取接口的参数数量
+            int count = 0xff&operands[2]; //TODO count代表参数个数，还是参数所占的槽位数？
+            //从操作数栈中推出方法的参数
+            ArrayList<Object> args = frame.getOperandStack().multiPop(count + 1);
+            Collections.reverse(args);
+            Object[] argsArr = args.toArray();
+
+            JvmObject thiz = (JvmObject)argsArr[0];
+            JvmMethod method = null;
+            //递归搜索接口方法
+            while(thiz != null){
+                if(thiz.getClazz().hasMethod(name, type)){
+                    method = thiz.getClazz().getMethod(name, type);
+                    break;
+                }else{
+                    thiz = thiz.getSuper();
+                }
+            }
+            if(method == null){
+                throw new AbstractMethodError(info.toString());
+            }
+            // 执行接口方法
+            method.call(env, thiz, Arrays.copyOfRange(argsArr,1, argsArr.length));
         }
     }
     ;
