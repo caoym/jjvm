@@ -9,12 +9,12 @@ import java.util.Arrays;
 public class JJvm {
     static public void main(String[] args){
         if(args.length == 0){
-            System.out.println("Usage: JJvm class [args...]");
+            System.out.println("Usage: <classpath> <JJvm class> [args...]");
             return;
         }
-        VirtualMachine vm = new VirtualMachine(Paths.get("."), args[0]);
+        VirtualMachine vm = new VirtualMachine(Paths.get(args[0]), args[1]);
         try {
-            args = Arrays.copyOfRange(args, 1, args.length);
+            args = Arrays.copyOfRange(args, 2, args.length);
             vm.run(args);
         } catch (Exception e) {
             e.printStackTrace();
