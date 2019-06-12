@@ -25,19 +25,37 @@ export JAVA_HOME JRE_HOME PATH CLASSPATH
 可以通过以下编译命令运行：
 
 ```shell
-#编译
-$javac org/jvm/jjvm/JJvm.java -XDignore.symbol.file=true -Xlint:unchecked
-$javac org/jvm/samples/HelloWorld.java 
+#编译sample1
+$javac org/jvm/jjvm/JJvm.java -XDignore.symbol.file=true
+$javac org/jvm/jjvm/JJvm.java -Xlint:unchecked
+$javac org/jvm/samples/sample1/HelloWorld.java 
 
 #运行
-$java org.jvm.jjvm.JJvm . org.jvm.samples.HelloWorld
+$java org.jvm.jjvm.JJvm . org.jvm.samples.sample1.HelloWorld
 ```
 
+```shell
+#编译sample2
+$javac org/jvm/jjvm/JJvm.java -XDignore.symbol.file=true
+$javac org/jvm/jjvm/JJvm.java -Xlint:unchecked
+$javac org/jvm/samples/sample2/Main.java 
+
+#运行
+$java org.jvm.jjvm.JJvm . org.jvm.samples.sample2.Main
+```
+目前运行sample2会报错，和 org.jvm.jjvm.opcode.OpcodeRout 对 AALoad 指令的实现有关
+
 ## FAQ
-###  error: package jdk.internal.org.objectweb.asm does not exist
-
+### error: package jdk.internal.org.objectweb.asm does not exist
+```shell
 默认 javac 不读取 rt.jar 中 classes内容，只读取符号表
-	- 符号表一般只包括标准API和部分其他API，如 com.sun., com.oracle. and sun.*
+	符号表一般只包括标准API和部分其他API，如 com.sun., com.oracle. and sun.*
+	
 编译选项加上 -XDignore.symbol.file=true
-javac org/jvm/jjvm/JJvm.java -XDignore.symbol.file=true
+	javac org/jvm/jjvm/JJvm.java -XDignore.symbol.file=true
+```
 
+### 未能自动清理旧class文件，重新编译前手动清理一下，执行
+```shell
+$find /data/code/java/jjvm -name *.class -type f -print -exec rm -rf {} \;
+```

@@ -294,6 +294,42 @@ public enum OpcodeRout {
         }
     },
     /**
+     * 将第0个 long 型局部变量进栈
+     */
+    LLOAD_0(Constants.LLOAD_0){
+        @Override
+        public void invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
+            frame.getOperandStack().push(frame.getLocalVariables().get(0), 1);
+        }
+    },    
+    /**
+     * 第1个long型局部变量进栈
+     */
+    LLOAD_1(Constants.LLOAD_1){
+    	@Override
+    	public void invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
+    		frame.getOperandStack().push(frame.getLocalVariables().get(1), 1);
+    	}
+    },   
+    /**
+     * 第2个long型局部变量进栈
+     */
+    LLOAD_2(Constants.LLOAD_2){
+    	@Override
+    	public void invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
+    		frame.getOperandStack().push(frame.getLocalVariables().get(2), 1);
+    	}
+    },  
+    /**
+     * 第3个long型局部变量进栈
+     */
+    LLOAD_3(Constants.LLOAD_3){
+    	@Override
+    	public void invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
+    		frame.getOperandStack().push(frame.getLocalVariables().get(3), 1);
+    	}
+    },      
+    /**
      * 将指定 int 型变量增加指定值。
      */
     IINC(Constants.IINC){
@@ -321,7 +357,9 @@ public enum OpcodeRout {
         public void invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
             int index = (int) frame.getOperandStack().pop();
             Object[] arrayRef = (Object[]) frame.getOperandStack().pop();
-            frame.getOperandStack().push(arrayRef[index]);
+            if( null != arrayRef && arrayRef.length > 0){
+                frame.getOperandStack().push(arrayRef[index]);
+            }
         }
     },
     /**

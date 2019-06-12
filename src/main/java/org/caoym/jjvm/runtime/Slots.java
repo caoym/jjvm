@@ -15,6 +15,7 @@ public class Slots<T> {
 
     public void set(int pos, T entity, int size) throws IllegalArgumentException{
         if(pos <0 || pos+size > buffer.length){
+        	//不支持动态扩容量
             throw new IllegalArgumentException("invalid entity size "+size);
         }
         buffer[pos] = entity;
