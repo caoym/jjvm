@@ -376,6 +376,16 @@ public enum OpcodeRout {
         }
     },
     /**
+     * array长度
+     */
+    ARRAYLENGTH(Constants.ARRAYLENGTH){
+        @Override
+        public void invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
+            Object[] arrayRef = (Object[]) frame.getOperandStack().pop();
+            frame.getOperandStack().push(arrayRef.length);
+        }
+    },
+    /**
      * 复制栈顶数值并将复制值压入栈顶。
      */
     DUP(Constants.DUP){

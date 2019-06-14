@@ -2,13 +2,20 @@
 
 这是一个Java实现的JAVA虚拟机，它会非常简单，实际上简单的只够运行HelloWorld。虽然简单，但尽量符合 JVM 标准，目前主要参考依据是[《Java虚拟机规范 （Java SE 7 中文版）》](http://www.iteye.com/topic/1117824)。
 
-非原创，原项目来自 https://github.com/caoym/jjvm ，代码暂无改动，运行方式有改动(原项目运行方式在我的环境不work)
+非原创，原项目来自 https://github.com/caoym/jjvm ，运行方式有改动(原项目运行方式在我的环境不work)
 
 
 # 用法
 
 ## 环境
 SUN jdk1.8 (OpenJdk1.8 运行缺少一些jar，用SUN JDK重装后解决)
+
+```shell
+$java -version
+java version "1.8.0_211"
+Java(TM) SE Runtime Environment (build 1.8.0_211-b12)
+Java HotSpot(TM) 64-Bit Server VM (build 25.211-b12, mixed mode)
+```
 
 ### 设置java环境
 将以下内容加入 /etc/profile ，保存后执行 source /etc/profile 使之生效
@@ -23,6 +30,8 @@ export JAVA_HOME JRE_HOME PATH CLASSPATH
 
 ## 编译和运行
 可以通过以下编译命令运行：
+### Sample1
+基本HelloWorld
 
 ```shell
 #编译sample1
@@ -34,16 +43,19 @@ $javac org/jvm/samples/sample1/HelloWorld.java
 $java org.jvm.jjvm.JJvm . org.jvm.samples.sample1.HelloWorld
 ```
 
+### Sample2
+带有Interface、父子类继承的Helloworld
+
 ```shell
 #编译sample2
 $javac org/jvm/jjvm/JJvm.java -XDignore.symbol.file=true
 $javac org/jvm/jjvm/JJvm.java -Xlint:unchecked
 $javac org/jvm/samples/sample2/Main.java 
 
-#运行
-$java org.jvm.jjvm.JJvm . org.jvm.samples.sample2.Main
+#运行(不加运行参数如inputVar1，会报错)
+$java org.jvm.jjvm.JJvm . org.jvm.samples.sample2.Main inputVar1         
 ```
-目前运行sample2会报错，和 org.jvm.jjvm.opcode.OpcodeRout 对 AALoad 指令的实现有关
+
 
 ## FAQ
 ### error: package jdk.internal.org.objectweb.asm does not exist
@@ -57,5 +69,5 @@ $java org.jvm.jjvm.JJvm . org.jvm.samples.sample2.Main
 
 ### 未能自动清理旧class文件，重新编译前手动清理一下，执行
 ```shell
-$find /data/code/java/jjvm -name *.class -type f -print -exec rm -rf {} \;
+$find . -name *.class -type f -print -exec rm -rf {} \;
 ```
