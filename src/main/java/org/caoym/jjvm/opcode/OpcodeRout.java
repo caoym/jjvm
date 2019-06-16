@@ -395,6 +395,33 @@ public enum OpcodeRout {
         }
     },
     /**
+     * 比较运算符：if_icmple
+     * 	if value1 is less than or equal to value2, 
+     * 		branch to instruction at branchoffset 
+     * 		(signed short constructed from unsigned bytes branchbyte1 << 8 + branchbyte2)
+     */
+    IF_ICMPLE(Constants.IF_ICMPLE){
+    	@Override
+    	public void invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
+    		Integer var2 = (Integer) frame.getOperandStack().pop();
+    		Integer var1 = (Integer) frame.getOperandStack().pop();
+            if(var1 <= var2) {
+                int offset = (operands[0]<<8)|operands[1];//TODO：该计算方式总得不到正确结果，有问题
+                frame.setPC(frame.getPC() + offset);
+            }
+    	}
+    },
+    /**
+     * 跳转运算符：goto
+     */
+    GOTO(Constants.GOTO){
+    	@Override
+    	public void invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
+    		int offset = (operands[0]<<8)|operands[1];//TODO：该计算方式总得不到正确结果，有问题
+			frame.setPC(frame.getPC() + offset);
+    	}
+    },    
+    /**
      * 为指定的类的静态域赋值。
      */
     PUTSTATIC(Constants.PUTSTATIC){
@@ -470,7 +497,7 @@ public enum OpcodeRout {
 
             JvmObject thiz = (JvmObject)argsArr[0];
             JvmMethod method = null;
-            //递归搜索接口方法
+            //依次向上搜索接口方法
             while(thiz != null){
                 if(thiz.getClazz().hasMethod(name, type)){
                     method = thiz.getClazz().getMethod(name, type);

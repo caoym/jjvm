@@ -4,6 +4,9 @@
 
 非原创，原项目来自 https://github.com/caoym/jjvm ，运行方式有改动(原项目运行方式在我的环境不work)
 
+## 参考项目
+	java版jvm实现( https://github.com/zachaxy/JVM )
+	go版jvm实现( https://github.com/zxh0/jvmgo-book )
 
 # 用法
 
@@ -35,12 +38,12 @@ export JAVA_HOME JRE_HOME PATH CLASSPATH
 
 ```shell
 #编译sample1
-$javac org/jvm/jjvm/JJvm.java -XDignore.symbol.file=true
-$javac org/jvm/jjvm/JJvm.java -Xlint:unchecked
-$javac org/jvm/samples/sample1/HelloWorld.java 
+$javac org/caoym/jjvm/JJvm.java -XDignore.symbol.file=true
+$javac org/caoym/jjvm/JJvm.java -Xlint:unchecked
+$javac org/caoym/samples/sample1/HelloWorld.java 
 
 #运行
-$java org.jvm.jjvm.JJvm . org.jvm.samples.sample1.HelloWorld
+$java org.caoym.jjvm.JJvm . org.caoym.samples.sample1.HelloWorld
 ```
 
 ### Sample2
@@ -48,12 +51,12 @@ $java org.jvm.jjvm.JJvm . org.jvm.samples.sample1.HelloWorld
 
 ```shell
 #编译sample2
-$javac org/jvm/jjvm/JJvm.java -XDignore.symbol.file=true
-$javac org/jvm/jjvm/JJvm.java -Xlint:unchecked
-$javac org/jvm/samples/sample2/Main.java 
+$javac org/caoym/jjvm/JJvm.java -XDignore.symbol.file=true
+$javac org/caoym/jjvm/JJvm.java -Xlint:unchecked
+$javac org/caoym/samples/sample2/Main.java 
 
 #运行(不加运行参数如inputVar1，会报错)
-$java org.jvm.jjvm.JJvm . org.jvm.samples.sample2.Main inputVar1         
+$java org.caoym.jjvm.JJvm . org.caoym.samples.sample2.Main inputVar1         
 ```
 
 
@@ -64,7 +67,7 @@ $java org.jvm.jjvm.JJvm . org.jvm.samples.sample2.Main inputVar1
 	符号表一般只包括标准API和部分其他API，如 com.sun., com.oracle. and sun.*
 	
 编译选项加上 -XDignore.symbol.file=true
-	javac org/jvm/jjvm/JJvm.java -XDignore.symbol.file=true
+	javac org/caoym/jjvm/JJvm.java -XDignore.symbol.file=true
 ```
 
 ### 未能自动清理旧class文件，重新编译前手动清理一下，执行
