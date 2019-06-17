@@ -222,6 +222,15 @@ public enum OpcodeRout {
         }
     },
     /**
+     * 将栈顶 int 型数值存入指定本地变量
+     */
+    ISTORE(Constants.ISTORE){
+        @Override
+        public void invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
+            frame.getLocalVariables().set(0, frame.getOperandStack().pop(), 1);
+        }
+    },    
+    /**
      * 将栈顶 int 型数值存入第0个局部变量
      */
     ISTORE_0(Constants.ISTORE_0){
@@ -406,8 +415,8 @@ public enum OpcodeRout {
     		Integer var2 = (Integer) frame.getOperandStack().pop();
     		Integer var1 = (Integer) frame.getOperandStack().pop();
             if(var1 <= var2) {
-                int offset = (operands[0]<<8)|operands[1];//TODO：该计算方式总得不到正确结果，有问题
-                frame.setPC(frame.getPC() + offset);
+                int offset = (operands[0]<<8)|operands[1];//跳转到第N条指令
+                frame.setPC(offset);
             }
     	}
     },
@@ -417,8 +426,8 @@ public enum OpcodeRout {
     GOTO(Constants.GOTO){
     	@Override
     	public void invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
-    		int offset = (operands[0]<<8)|operands[1];//TODO：该计算方式总得不到正确结果，有问题
-			frame.setPC(frame.getPC() + offset);
+    		int offset = (operands[0]<<8)|operands[1];//跳转到第N条指令
+			frame.setPC(offset);
     	}
     },    
     /**

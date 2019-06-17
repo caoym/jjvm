@@ -1,4 +1,4 @@
-package org.jvm.samples.sample2;
+package org.caoym.samples.sample2;
 
 class Speaker implements SpeakerInterface {
     private String hello = "";

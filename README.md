@@ -8,6 +8,26 @@
 	java版jvm实现( https://github.com/zachaxy/JVM )
 	go版jvm实现( https://github.com/zxh0/jvmgo-book )
 
+## 疑问
+### 本项目实现的问题
+在尝试实现&调试“条件跳转指令”过程中，遇到PC、offset计算问题。
+按JVM文档、资料、class二进制内容，得到的结果都是新地址为
+
+```shell
+	offset+PC
+		其中 offste = (operand1<<8)|operand2
+```
+
+但本项目中，PC地址似乎保存的是第N条指令，于是直接加offset，会超出operands数组长度范围
+
+参考项目，如 https://github.com/zachaxy/JVM/ 的 blob/master/Java/src/instructions/base/BytecodeReader.java
+
+```
+程序自己维护PC，并且每读出一个 UINT8 内容，会递增 PC
+这个才比较符合JVM规范的说明
+```
+
+
 # 用法
 
 ## 环境
