@@ -14,6 +14,8 @@ import java.util.*;
 
 /**
  * 操作数例程
+ * 		- 实现 opcode 操作
+ * 		- 实现 opcode 对应 operand 处理
  */
 public enum OpcodeRout {
 
@@ -22,9 +24,10 @@ public enum OpcodeRout {
      */
     ALOAD_0(Constants.ALOAD_0){
         @Override
-        public void invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
+        public int invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
             Object object = frame.getLocalVariables().get(0);
             frame.getOperandStack().push(object, 1);
+            return 0;
         }
     },
     /**
@@ -32,8 +35,9 @@ public enum OpcodeRout {
      */
     ALOAD_1(Constants.ALOAD_1){
         @Override
-        public void invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
+        public int invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
             frame.getOperandStack().push(frame.getLocalVariables().get(1), 1);
+            return 0;
         }
     },
     /**
@@ -41,8 +45,9 @@ public enum OpcodeRout {
      */
     ALOAD_2(Constants.ALOAD_2){
         @Override
-        public void invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
+        public int invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
             frame.getOperandStack().push(frame.getLocalVariables().get(2), 1);
+            return 0;
         }
     },
     /**
@@ -50,8 +55,9 @@ public enum OpcodeRout {
      */
     ALOAD_3(Constants.ALOAD_3){
         @Override
-        public void invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
+        public int invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
             frame.getOperandStack().push(frame.getLocalVariables().get(3), 1);
+            return 0;
         }
     },
     /**
@@ -59,8 +65,9 @@ public enum OpcodeRout {
      */
     RETURN(Constants.RETURN){
         @Override
-        public void invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
+        public int invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
             frame.setReturn(null, "void");
+            return 0;
         }
     },
     /**
@@ -68,7 +75,7 @@ public enum OpcodeRout {
      */
     GETSTATIC(Constants.GETSTATIC){
         @Override
-        public void invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
+        public int invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
             int index = (operands[0]<<8)|operands[1];
             ConstantPool.CONSTANT_Fieldref_info info
                     = (ConstantPool.CONSTANT_Fieldref_info)frame.getConstantPool().get(index);
@@ -78,6 +85,7 @@ public enum OpcodeRout {
             //静态字段的值
             Object value = field.get(env,null);
             frame.getOperandStack().push(value, 1);
+            return 0;
         }
     },
     /**
@@ -85,7 +93,7 @@ public enum OpcodeRout {
      */
     INVOKESPECIAL(Constants.INVOKESPECIAL){
         @Override
-        public void invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
+        public int invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
             int arg = (operands[0]<<8)|operands[1];
 
             ConstantPool.CONSTANT_Methodref_info info
@@ -107,6 +115,7 @@ public enum OpcodeRout {
                 thiz = thiz.getSuper();
             }
             method.call(env, thiz, Arrays.copyOfRange(argsArr,1, argsArr.length));
+            return 0;
         }
     },
     /**
@@ -114,10 +123,11 @@ public enum OpcodeRout {
      */
     LDC(Constants.LDC){
         @Override
-        public void invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
+        public int invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
             int arg = operands[0];
             ConstantPool.CPInfo info = frame.getConstantPool().get(arg);
             frame.getOperandStack().push(asObject(info), 1);
+            return 0;
         }
     },
     /**
@@ -125,8 +135,9 @@ public enum OpcodeRout {
      */
     INVOKEVIRTUAL(Constants.INVOKEVIRTUAL){
         @Override
-        public void invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
+        public int invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
             INVOKESPECIAL.invoke(env, frame, operands);
+            return 0;
         }
     },
     /**
@@ -134,8 +145,9 @@ public enum OpcodeRout {
      */
     DCONST_0(Constants.DCONST_0){
         @Override
-        public void invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
+        public int invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
             frame.getOperandStack().push(0.0,2);
+            return 0;
         }
     },
     /**
@@ -143,9 +155,10 @@ public enum OpcodeRout {
      */
     DSTORE_1(Constants.DSTORE_1){
         @Override
-        public void invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
+        public int invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
             Object var = frame.getOperandStack().pop();
             frame.getLocalVariables().set(1, var, 2);
+            return 0;
         }
     },
     /**
@@ -153,17 +166,19 @@ public enum OpcodeRout {
      */
     DLOAD_1(Constants.DLOAD_1){
         @Override
-        public void invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
+        public int invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
             Object var = frame.getLocalVariables().get(1);
             frame.getOperandStack().push(var, 2);
+            return 0;
         }
     },
 
     //dconst_1: 将 double 型 1 推送至栈顶
     DCONST_1(Constants.DCONST_1){
         @Override
-        public void invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
+        public int invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
             frame.getOperandStack().push(1.0, 2);
+            return 0;
         }
     },
     /**
@@ -171,10 +186,11 @@ public enum OpcodeRout {
      */
     DADD(Constants.DADD){
         @Override
-        public void invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
+        public int invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
             Double var1 = (Double) frame.getOperandStack().pop();
             Double var2 = (Double) frame.getOperandStack().pop();
             frame.getOperandStack().push(var1 + var2, 2);
+            return 0;
         }
     },
     /**
@@ -182,43 +198,49 @@ public enum OpcodeRout {
      */
     ICONST_0(Constants.ICONST_0){
         @Override
-        public void invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
+        public int invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
             frame.getOperandStack().push(0,1);
+            return 0;
         }
     },
     //iconst_1: 将 int 型 1 推送至栈顶
     ICONST_1(Constants.ICONST_1){
         @Override
-        public void invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
+        public int invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
             frame.getOperandStack().push(1, 1);
+            return 0;
         }
     },
     //iconst_2: 将 int 型 2 推送至栈顶
     ICONST_2(Constants.ICONST_2){
         @Override
-        public void invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
+        public int invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
             frame.getOperandStack().push(2, 1);
+            return 0;
         }
     },
     //iconst_3: 将 int 型 3 推送至栈顶
     ICONST_3(Constants.ICONST_3){
         @Override
-        public void invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
+        public int invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
             frame.getOperandStack().push(3, 1);
+            return 0;
         }
     },
     //iconst_4: 将 int 型 4 推送至栈顶
     ICONST_4(Constants.ICONST_4){
         @Override
-        public void invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
+        public int invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
             frame.getOperandStack().push(4, 1);
+            return 0;
         }
     },
     //iconst_5: 将 int 型 5 推送至栈顶
     ICONST_5(Constants.ICONST_5){
         @Override
-        public void invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
+        public int invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
             frame.getOperandStack().push(5, 1);
+            return 0;
         }
     },
     /**
@@ -226,8 +248,9 @@ public enum OpcodeRout {
      */
     ISTORE(Constants.ISTORE){
         @Override
-        public void invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
+        public int invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
             frame.getLocalVariables().set(0, frame.getOperandStack().pop(), 1);
+            return 0;
         }
     },    
     /**
@@ -235,8 +258,9 @@ public enum OpcodeRout {
      */
     ISTORE_0(Constants.ISTORE_0){
         @Override
-        public void invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
+        public int invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
             frame.getLocalVariables().set(0, frame.getOperandStack().pop(), 1);
+            return 0;
         }
     },
     /**
@@ -244,8 +268,9 @@ public enum OpcodeRout {
      */
     ISTORE_1(Constants.ISTORE_1){
         @Override
-        public void invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
+        public int invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
             frame.getLocalVariables().set(1, frame.getOperandStack().pop(), 1);
+            return 0;
         }
     },
     /**
@@ -253,8 +278,9 @@ public enum OpcodeRout {
      */
     ISTORE_2(Constants.ISTORE_2){
         @Override
-        public void invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
+        public int invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
             frame.getLocalVariables().set(2, frame.getOperandStack().pop(), 1);
+            return 0;
         }
     },
     /**
@@ -262,8 +288,9 @@ public enum OpcodeRout {
      */
     ISTORE_3(Constants.ISTORE_3){
         @Override
-        public void invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
+        public int invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
             frame.getLocalVariables().set(3, frame.getOperandStack().pop(), 1);
+            return 0;
         }
     },
     /**
@@ -271,8 +298,9 @@ public enum OpcodeRout {
      */
     ILOAD_0(Constants.ILOAD_0){
         @Override
-        public void invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
+        public int invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
             frame.getOperandStack().push(frame.getLocalVariables().get(0), 1);
+            return 0;
         }
     },
     /**
@@ -280,8 +308,9 @@ public enum OpcodeRout {
      */
     ILOAD_1(Constants.ILOAD_1){
         @Override
-        public void invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
+        public int invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
             frame.getOperandStack().push(frame.getLocalVariables().get(1), 1);
+            return 0;
         }
     },
     /**
@@ -289,8 +318,9 @@ public enum OpcodeRout {
      */
     ILOAD_2(Constants.ILOAD_2){
         @Override
-        public void invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
+        public int invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
             frame.getOperandStack().push(frame.getLocalVariables().get(2), 1);
+            return 0;
         }
     },
     /**
@@ -298,8 +328,9 @@ public enum OpcodeRout {
      */
     ILOAD_3(Constants.ILOAD_3){
         @Override
-        public void invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
+        public int invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
             frame.getOperandStack().push(frame.getLocalVariables().get(3), 1);
+            return 0;
         }
     },
     /**
@@ -307,8 +338,9 @@ public enum OpcodeRout {
      */
     LLOAD_0(Constants.LLOAD_0){
         @Override
-        public void invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
+        public int invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
             frame.getOperandStack().push(frame.getLocalVariables().get(0), 1);
+            return 0;
         }
     },    
     /**
@@ -316,8 +348,9 @@ public enum OpcodeRout {
      */
     LLOAD_1(Constants.LLOAD_1){
     	@Override
-    	public void invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
+    	public int invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
     		frame.getOperandStack().push(frame.getLocalVariables().get(1), 1);
+    		return 0;
     	}
     },   
     /**
@@ -325,8 +358,9 @@ public enum OpcodeRout {
      */
     LLOAD_2(Constants.LLOAD_2){
     	@Override
-    	public void invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
+    	public int invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
     		frame.getOperandStack().push(frame.getLocalVariables().get(2), 1);
+    		return 0;
     	}
     },  
     /**
@@ -334,8 +368,9 @@ public enum OpcodeRout {
      */
     LLOAD_3(Constants.LLOAD_3){
     	@Override
-    	public void invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
+    	public int invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
     		frame.getOperandStack().push(frame.getLocalVariables().get(3), 1);
+    		return 0;
     	}
     },      
     /**
@@ -343,9 +378,10 @@ public enum OpcodeRout {
      */
     IINC(Constants.IINC){
         @Override
-        public void invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
+        public int invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
             Integer var = (Integer) frame.getLocalVariables().get(operands[0]);
             frame.getLocalVariables().set(operands[0], var + operands[1], 1);
+            return 0;
         }
     },
     /**
@@ -353,9 +389,10 @@ public enum OpcodeRout {
      */
     I2D(Constants.I2D){
         @Override
-        public void invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
+        public int invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
             Integer var = (Integer) frame.getOperandStack().pop();
             frame.getOperandStack().push((double) var, 2);
+            return 0;
         }
     },
     /**
@@ -363,12 +400,13 @@ public enum OpcodeRout {
      */
     AALOAD(Constants.AALOAD){
         @Override
-        public void invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
+        public int invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
             int index = (int) frame.getOperandStack().pop();
             Object[] arrayRef = (Object[]) frame.getOperandStack().pop();
             if( null != arrayRef && arrayRef.length > 0){
                 frame.getOperandStack().push(arrayRef[index]);
             }
+            return 0;
         }
     },
     /**
@@ -376,12 +414,13 @@ public enum OpcodeRout {
      */
     NEW(Constants.NEW){
         @Override
-        public void invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
+        public int invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
             int index = (operands[0] << 8)| operands[1];
             ConstantPool.CONSTANT_Class_info info
                     = (ConstantPool.CONSTANT_Class_info)frame.getConstantPool().get(index);
             JvmClass clazz = env.getVm().getClass(info.getName());
             frame.getOperandStack().push(clazz.newInstance(env));
+            return 0;
         }
     },
     /**
@@ -389,9 +428,10 @@ public enum OpcodeRout {
      */
     ARRAYLENGTH(Constants.ARRAYLENGTH){
         @Override
-        public void invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
+        public int invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
             Object[] arrayRef = (Object[]) frame.getOperandStack().pop();
             frame.getOperandStack().push(arrayRef.length);
+            return 0;
         }
     },
     /**
@@ -399,8 +439,9 @@ public enum OpcodeRout {
      */
     DUP(Constants.DUP){
         @Override
-        public void invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
+        public int invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
             frame.getOperandStack().push(frame.getOperandStack().pick(), frame.getOperandStack().getEndSize());
+            return 0;
         }
     },
     /**
@@ -411,13 +452,14 @@ public enum OpcodeRout {
      */
     IF_ICMPLE(Constants.IF_ICMPLE){
     	@Override
-    	public void invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
+    	public int invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
     		Integer var2 = (Integer) frame.getOperandStack().pop();
     		Integer var1 = (Integer) frame.getOperandStack().pop();
             if(var1 <= var2) {
                 int offset = (operands[0]<<8)|operands[1];//跳转到第N条指令
-                frame.setPC(offset);
+                return offset;
             }
+            return 0;
     	}
     },
     /**
@@ -425,9 +467,9 @@ public enum OpcodeRout {
      */
     GOTO(Constants.GOTO){
     	@Override
-    	public void invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
+    	public int invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
     		int offset = (operands[0]<<8)|operands[1];//跳转到第N条指令
-			frame.setPC(offset);
+			return offset;
     	}
     },    
     /**
@@ -435,7 +477,7 @@ public enum OpcodeRout {
      */
     PUTSTATIC(Constants.PUTSTATIC){
         @Override
-        public void invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
+        public int invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
             Object var = frame.getOperandStack().pop();
             int index = (operands[0] << 8)| operands[1];
             ConstantPool.CONSTANT_Fieldref_info info
@@ -444,6 +486,7 @@ public enum OpcodeRout {
             JvmClass clazz = env.getVm().getClass(info.getClassName());
             JvmField field = clazz.getField(info.getNameAndTypeInfo().getName());
             field.set(env, null, var);
+            return 0;
         }
     },
     /**
@@ -451,7 +494,7 @@ public enum OpcodeRout {
      */
     PUTFIELD(Constants.PUTFIELD){
         @Override
-        public void invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
+        public int invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
             Object value = frame.getOperandStack().pop();
             Object objectref = frame.getOperandStack().pop();
 
@@ -462,6 +505,7 @@ public enum OpcodeRout {
             JvmField field = clazz.getField(info.getNameAndTypeInfo().getName());
             assert field != null;
             field.set(env,objectref, value);
+            return 0;
         }
     },
     /**
@@ -469,7 +513,7 @@ public enum OpcodeRout {
      */
     GETFIELD(Constants.GETFIELD){
         @Override
-        public void invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
+        public int invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
             Object objectref = frame.getOperandStack().pop();
 
             int index = (operands[0] << 8)| operands[1];
@@ -478,6 +522,7 @@ public enum OpcodeRout {
             JvmClass clazz = env.getVm().getClass(info.getClassName());
             JvmField field = clazz.getField(info.getNameAndTypeInfo().getName());
             frame.getOperandStack().push(field.get(env, objectref));
+            return 0;
         }
     },
     /**
@@ -485,7 +530,7 @@ public enum OpcodeRout {
      */
     INVOKEINTERFACE(Constants.INVOKEINTERFACE){
         @Override
-        public void invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
+        public int invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
 
             // 获取接口和方法信息
             int arg = (operands[0]<<8)|operands[1];
@@ -520,6 +565,7 @@ public enum OpcodeRout {
             }
             // 执行接口方法
             method.call(env, thiz, Arrays.copyOfRange(argsArr,1, argsArr.length));
+            return 0;
         }
     }
     ;
@@ -532,8 +578,12 @@ public enum OpcodeRout {
         this.code = code;
     }
 
-    public abstract void invoke(Env env, StackFrame frame, byte[] operands) throws Exception;
+    public abstract int invoke(Env env, StackFrame frame, byte[] operands) throws Exception;
 
+    public int getNoOfOperands() {
+    	return 0;
+    }
+    
     public short getCode() {
         return code;
     }
@@ -541,7 +591,7 @@ public enum OpcodeRout {
     public static OpcodeRout valueOf(short code){
         OpcodeRout op = codeMapping.get(code);
         if(op == null){
-            throw new InternalError("The opcode "+Constants.OPCODE_NAMES[code]+" Not Impl");
+            throw new InternalError("The opcode ["+Constants.OPCODE_NAMES[code]+"] Not Impl");
         }
         return op;
     }

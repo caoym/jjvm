@@ -15,16 +15,17 @@ public class JvmStack {
     private boolean running = false;
 
     public StackFrame newFrame(JvmClass clazz, JvmMethod method) {
-        StackFrame frame = new StackFrame(clazz, method, null, null, 0, 0);
+        StackFrame frame = new StackFrame(clazz, method, null, null, null, 0, 0);
         frames.push(frame, 1);
         return frame;
     }
 
     public StackFrame newFrame(JvmClass clazz, JvmMethod method, ConstantPool constantPool,
                                OpcodeInvoker[] opcodes,
+                               OpcodeInvoker[] ops,
                                int variables,
                                int stackSize) {
-        StackFrame frame = new StackFrame(clazz, method, constantPool, opcodes, variables, stackSize);
+        StackFrame frame = new StackFrame(clazz, method, constantPool, opcodes, ops, variables, stackSize);
         frames.push(frame, 1);
         return frame;
     }

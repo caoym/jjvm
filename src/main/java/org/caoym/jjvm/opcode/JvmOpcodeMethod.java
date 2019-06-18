@@ -1,5 +1,6 @@
 package org.caoym.jjvm.opcode;
 
+
 import com.sun.tools.classfile.*;
 import org.caoym.jjvm.lang.JvmMethod;
 import org.caoym.jjvm.runtime.*;
@@ -12,6 +13,7 @@ public class JvmOpcodeMethod implements JvmMethod {
     private final JvmOpcodeClass clazz;
     private final Method method;
     private final OpcodeInvoker[] opcodes;
+    private final OpcodeInvoker[] ops;
     private final Code_attribute codeAttribute;
     private final String name;
     private final int parameterCount;
@@ -21,6 +23,7 @@ public class JvmOpcodeMethod implements JvmMethod {
         this.clazz = clazz;
         this.method = method;
         codeAttribute = (Code_attribute)method.attributes.get("Code");
+        ops = BytecodeInterpreter.parseOps(codeAttribute.code);
         opcodes = BytecodeInterpreter.parseCodes(codeAttribute.code);
         String temp = "";
         temp = method.getName(clazz.getClassFile().constant_pool);
@@ -40,6 +43,7 @@ public class JvmOpcodeMethod implements JvmMethod {
                 this,
                 clazz.getClassFile().constant_pool,
                 opcodes,
+                ops,
                 codeAttribute.max_locals,
                 codeAttribute.max_stack);
 
