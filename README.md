@@ -2,30 +2,13 @@
 
 这是一个Java实现的JAVA虚拟机，它会非常简单，实际上简单的只够运行HelloWorld。虽然简单，但尽量符合 JVM 标准，目前主要参考依据是[《Java虚拟机规范 （Java SE 7 中文版）》](http://www.iteye.com/topic/1117824)。
 
-非原创，原项目来自 https://github.com/caoym/jjvm ，运行方式有改动(原项目运行方式在我的环境不work)
+非原创，原项目来自 https://github.com/caoym/jjvm ，
+	运行方式有改动(原项目运行方式在我的环境不work)
+	pc和opcode运行时处理有修改(原实现无法支持条件跳转; 且增加一些其他opcode)
 
 ## 参考项目
 	java版jvm实现( https://github.com/zachaxy/JVM )
 	go版jvm实现( https://github.com/zxh0/jvmgo-book )
-
-## 疑问
-### 本项目实现的问题
-在尝试实现&调试“条件跳转指令”过程中，遇到PC、offset计算问题。
-按JVM文档、资料、class二进制内容，得到的结果都是新地址为
-
-```shell
-	offset+PC
-		其中 offste = (operand1<<8)|operand2
-```
-
-但本项目中，PC地址似乎保存的是第N条指令，于是直接加offset，会超出operands数组长度范围
-
-参考项目，如 https://github.com/zachaxy/JVM/ 的 blob/master/Java/src/instructions/base/BytecodeReader.java
-
-```
-程序自己维护PC，并且每读出一个 UINT8 内容，会递增 PC
-这个才比较符合JVM规范的说明
-```
 
 
 # 用法
@@ -57,7 +40,7 @@ export JAVA_HOME JRE_HOME PATH CLASSPATH
 基本HelloWorld
 
 ```shell
-#编译sample1
+#编译 sample1
 $javac org/caoym/jjvm/JJvm.java -XDignore.symbol.file=true
 $javac org/caoym/jjvm/JJvm.java -Xlint:unchecked
 $javac org/caoym/samples/sample1/HelloWorld.java 
@@ -70,7 +53,7 @@ $java org.caoym.jjvm.JJvm . org.caoym.samples.sample1.HelloWorld
 带有Interface、父子类继承的Helloworld
 
 ```shell
-#编译sample2
+#编译 sample2
 $javac org/caoym/jjvm/JJvm.java -XDignore.symbol.file=true
 $javac org/caoym/jjvm/JJvm.java -Xlint:unchecked
 $javac org/caoym/samples/sample2/Main.java 
@@ -79,6 +62,18 @@ $javac org/caoym/samples/sample2/Main.java
 $java org.caoym.jjvm.JJvm . org.caoym.samples.sample2.Main inputVar1         
 ```
 
+### Sample3
+带有条件跳转的Helloworld
+
+```shell
+#编译 sample3
+$javac org/caoym/jjvm/JJvm.java -XDignore.symbol.file=true
+$javac org/caoym/jjvm/JJvm.java -Xlint:unchecked
+$javac org/caoym/samples/sample3/HelloWorld.java 
+
+#运行
+$java org.caoym.jjvm.JJvm . org.caoym.samples.sample3.HelloWorld
+```
 
 ## FAQ
 ### error: package jdk.internal.org.objectweb.asm does not exist
