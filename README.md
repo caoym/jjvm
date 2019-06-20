@@ -2,13 +2,23 @@
 
 这是一个Java实现的JAVA虚拟机，它会非常简单，实际上简单的只够运行HelloWorld。虽然简单，但尽量符合 JVM 标准，目前主要参考依据是[《Java虚拟机规范 （Java SE 7 中文版）》](http://www.iteye.com/topic/1117824)。
 
-非原创，原项目来自 https://github.com/caoym/jjvm ，
-	运行方式有改动(原项目运行方式在我的环境不work)
-	pc和opcode运行时处理有修改(原实现无法支持条件跳转; 且增加一些其他opcode)
+
+非原创，原项目来自 https://github.com/caoym/jjvm 
+
++ 运行方式有改动 (原项目运行方式在我的环境不work)
++ pc处理机制有修改
+	
+	原实现无法支持条件跳转
+
++ opcode 新增指令
+
+	增加if_cmple,goto
+	增加iload_n
+
 
 ## 参考项目
-	java版jvm实现( https://github.com/zachaxy/JVM )
-	go版jvm实现( https://github.com/zxh0/jvmgo-book )
++ java版jvm实现( https://github.com/zachaxy/JVM )
++ go版jvm实现( https://github.com/zxh0/jvmgo-book )
 
 
 # 用法
@@ -73,6 +83,19 @@ $javac org/caoym/samples/sample3/HelloWorld.java
 
 #运行
 $java org.caoym.jjvm.JJvm . org.caoym.samples.sample3.HelloWorld
+```
+
+### Sample4
+线程
+
+```shell
+#编译 sample4
+$javac org/caoym/jjvm/JJvm.java -XDignore.symbol.file=true
+$javac org/caoym/jjvm/JJvm.java -Xlint:unchecked
+$javac org/caoym/samples/sample4/TestThread.java 
+
+#运行
+$java org.caoym.jjvm.JJvm . org.caoym.samples.sample4.TestThread
 ```
 
 ## FAQ

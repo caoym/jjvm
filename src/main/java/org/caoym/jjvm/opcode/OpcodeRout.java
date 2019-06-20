@@ -119,6 +119,36 @@ public enum OpcodeRout {
         }
     },
     /**
+     * 调用静态方法(冒用对象方法调用试试)
+     */
+    INVOKESTATIC(Constants.INVOKESTATIC){
+        @Override
+        public int invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
+            int arg = (operands[0]<<8)|operands[1];
+
+            ConstantPool.CONSTANT_Methodref_info info
+                    = (ConstantPool.CONSTANT_Methodref_info)frame.getConstantPool().get(arg);
+
+            JvmClass clazz  = env.getVm().getClass(info.getClassName());
+            JvmMethod method = clazz.getMethod(
+                    info.getNameAndTypeInfo().getName(),
+                    info.getNameAndTypeInfo().getType()
+            );
+            //从操作数栈中推出方法的参数
+            ArrayList<Object> args = frame.getOperandStack().multiPop(method.getParameterCount());
+            Collections.reverse(args);
+            Object[] argsArr = args.toArray();
+            JvmObject thiz = (JvmObject) argsArr[0];
+
+            //根据类名确定是调用父类还是子类
+            while (!thiz.getClazz().getName().equals(clazz.getName())){
+                thiz = thiz.getSuper();
+            }
+            method.call(env, thiz, Arrays.copyOfRange(argsArr,1, argsArr.length));
+            return 0;
+        }
+    },
+    /**
      *  将 int，float 或 String 型常量值从常量池中推送至栈顶
      */
     LDC(Constants.LDC){
@@ -130,6 +160,70 @@ public enum OpcodeRout {
             return 0;
         }
     },
+    /**
+     *  将int, float或String型常量值从常量池中推送至栈顶（宽索引）
+     */
+    LDC_W(Constants.LDC_W){
+        @Override
+        public int invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
+            int arg = (operands[0]<<8)|operands[1];
+            ConstantPool.CPInfo info = frame.getConstantPool().get(arg);
+            frame.getOperandStack().push(asObject(info), 1);
+            return 0;
+        }
+    },    
+    /**
+     *  将long或double型常量值从常量池中推送至栈顶（宽索引）
+     */
+    LDC2_W(Constants.LDC2_W){
+        @Override
+        public int invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
+            int arg = (operands[0]<<8)|operands[1];
+            ConstantPool.CPInfo info = frame.getConstantPool().get(arg);
+            frame.getOperandStack().push(asObject(info), 1);
+            return 0;
+        }
+    },      
+	/**
+     * 将栈顶引用型数值存入第0个本地变量
+     */
+    ASTORE_0(Constants.ASTORE_0){
+        @Override
+        public int invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
+            frame.getLocalVariables().set(0, frame.getOperandStack().pop(), 1);
+            return 0;
+        }
+    },
+	/**
+     * 将栈顶引用型数值存入第1个本地变量
+     */
+    ASTORE_1(Constants.ASTORE_1){
+        @Override
+        public int invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
+            frame.getLocalVariables().set(1, frame.getOperandStack().pop(), 1);
+            return 0;
+        }
+    },
+	/**
+     * 将栈顶引用型数值存入第2个本地变量
+     */
+    ASTORE_2(Constants.ASTORE_2){
+        @Override
+        public int invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
+            frame.getLocalVariables().set(2, frame.getOperandStack().pop(), 1);
+            return 0;
+        }
+    },
+	/**
+     * 将栈顶引用型数值存入第3个本地变量
+     */
+    ASTORE_3(Constants.ASTORE_3){
+        @Override
+        public int invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
+            frame.getLocalVariables().set(3, frame.getOperandStack().pop(), 1);
+            return 0;
+        }
+    },	
     /**
      * 调用实例方法
      */
@@ -444,6 +538,20 @@ public enum OpcodeRout {
             return 0;
         }
     },
+	/**
+	 * 当栈顶int型数值小于等于0时跳转
+	 */
+    IFLE(Constants.IFLE){
+        @Override
+        public int invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
+        	Integer var = (Integer) frame.getOperandStack().pop();
+            if(var <= 0) {
+                int offset = (operands[0]<<8)|operands[1];
+                return offset;
+            }
+            return 0;
+        }
+    },
     /**
      * 比较运算符：if_icmple
      * 	if value1 is less than or equal to value2, 
@@ -456,7 +564,7 @@ public enum OpcodeRout {
     		Integer var2 = (Integer) frame.getOperandStack().pop();
     		Integer var1 = (Integer) frame.getOperandStack().pop();
             if(var1 <= var2) {
-                int offset = (operands[0]<<8)|operands[1];//跳转到第N条指令
+                int offset = (operands[0]<<8)|operands[1];
                 return offset;
             }
             return 0;
@@ -468,10 +576,38 @@ public enum OpcodeRout {
     GOTO(Constants.GOTO){
     	@Override
     	public int invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
-    		int offset = (operands[0]<<8)|operands[1];//跳转到第N条指令
+    		int offset = (operands[0]<<8)|operands[1];
 			return offset;
     	}
+    }, 
+    /**
+     * 如果值为空，则跳转
+     */
+    IFNULL(Constants.IFNULL) {
+    	@Override
+    	public int invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
+    		Integer var = (Integer) frame.getOperandStack().pop();
+            if(null == var) {
+                int offset = (operands[0]<<8)|operands[1];
+                return offset;
+            }
+            return 0;
+    	}
     },    
+    /**
+     * 如果值非空，则跳转
+     */
+    IFNONNULL(Constants.IFNONNULL) {
+    	@Override
+    	public int invoke(Env env, StackFrame frame, byte[] operands) throws Exception {
+    		Integer var = (Integer) frame.getOperandStack().pop();
+            if(null != var) {
+                int offset = (operands[0]<<8)|operands[1];
+                return offset;
+            }
+            return 0;
+    	}
+    },
     /**
      * 为指定的类的静态域赋值。
      */

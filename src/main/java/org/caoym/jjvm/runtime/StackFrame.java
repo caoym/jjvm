@@ -65,6 +65,9 @@ public class StackFrame {
     public Slots<Object> getLocalVariables() {
         return localVariables;
     }
+    public void setLocalVariables() {
+    	
+    }
 
     public SlotsStack<Object> getOperandStack() {
         return operandStack;
