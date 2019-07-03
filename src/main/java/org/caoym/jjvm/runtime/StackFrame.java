@@ -30,6 +30,11 @@ public class StackFrame {
     private OpcodeInvoker[] opcodes;
 
     /**
+     * 字节码 &操作数
+     */
+    private OpcodeInvoker[] ops;    
+    
+    /**
      * 程序计数器
      */
     private int pc=0;
@@ -45,10 +50,12 @@ public class StackFrame {
 
     StackFrame(JvmClass clazz,JvmMethod method, ConstantPool constantPool,
                       OpcodeInvoker[] opcodes,
+                      OpcodeInvoker[] ops,
                       int variables,
                       int stackSize) {
         this.constantPool = constantPool;
         this.opcodes = opcodes;
+        this.ops = ops;
         this.operandStack = new SlotsStack<>(stackSize);
         this.localVariables = new Slots<>(variables);
         this.clazz = clazz;
@@ -57,6 +64,9 @@ public class StackFrame {
 
     public Slots<Object> getLocalVariables() {
         return localVariables;
+    }
+    public void setLocalVariables() {
+    	
     }
 
     public SlotsStack<Object> getOperandStack() {
@@ -91,13 +101,22 @@ public class StackFrame {
     public int getPC() {
         return pc;
     }
+    
     public int increasePC(){
         return pc++;
     }
+    public int increasePC(int n) {
+    	pc = pc + n;
+    	return pc;
+    }
+    
     public OpcodeInvoker[] getOpcodes() {
         return opcodes;
     }
-
+    public OpcodeInvoker[] getOps() {
+        return ops;
+    }
+    
     public JvmClass getCurrentClass() {
         return clazz;
     }

@@ -22,6 +22,7 @@ public class SlotsStack<T> {
 
     public void push(T entity, int size) throws IllegalArgumentException{
         if(size <=0 || end+size>buffer.length){
+        	//不支持动态扩容
             throw new IllegalArgumentException("invalid entity size "+size);
         }
         buffer[end] = entity;

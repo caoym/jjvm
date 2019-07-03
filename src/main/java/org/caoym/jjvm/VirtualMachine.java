@@ -41,7 +41,7 @@ public class VirtualMachine {
                 "main",
                 "([Ljava/lang/String;)V");
         //执行入口方法
-        method.call(env, null, new Object[]{args});
+        method.call(env, null, new Object[]{args});//TODO:多个class文件，是如何组织？何时加载的？
     }
 
     public JvmClass getClass(String className) throws ClassNotFoundException {
